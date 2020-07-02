@@ -24,22 +24,30 @@ public class Element : MonoBehaviour
         switch (stored)
         {
             case Elements.None:
+                typeStored.color = new Color(0f, 0f, 0f, 0f);
                 break;
             case Elements.Brave:
+                typeStored.color = new Color(1f, 0f, 0f, 0.5f);
                 break;
             case Elements.Agile:
+                typeStored.color = new Color(0f, 1f, 0f, 0.5f);
                 break;
             case Elements.Guard:
+                typeStored.color = new Color(0f, 0f, 1f, 0.5f);
                 break;
             case Elements.Origin:
+                typeStored.color = new Color(1f, 1f, 0f, 0.5f);
                 break;
             case Elements.Earth:
+                typeStored.color = new Color(1f, 0f, 1f, 0.5f);
                 break;
             case Elements.Chaos:
+                typeStored.color = new Color(1f, 1f, 1f, 0.5f);
                 break;
             case Elements.Iridescent:
                 break;
             case Elements.Dark:
+                typeStored.color = new Color(0f, 0f, 0f, 0.5f);
                 break;
         }
     }
@@ -65,17 +73,29 @@ public class Element : MonoBehaviour
     {
         while (true)
         {
-            if (fade)
+            if (stored == Elements.None)
             {
-                typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 0.5f), 2f, false, true);
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(0.05f);
+            }   
+            else if (stored == Elements.Iridescent)
+            {
+                
             }
             else
             {
-                typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 0.8f), 1f, false, true);
-                yield return new WaitForSeconds(1f);
+                if (fade)
+                {
+                    typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 0.5f), 2f, false, true);
+                    yield return new WaitForSeconds(2f);
+                    fade = false;
+                }
+                else
+                {
+                    typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 0.8f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    fade = true;
+                }
             }
-                
         }
     }
 
@@ -84,11 +104,14 @@ public class Element : MonoBehaviour
         string name = gameObject.name.Replace("Slot (", "").Replace(")","");
         ID = int.Parse(name);
 
-        typeStored = gameObject.GetComponent<Image>();
+        typeStored = gameObject.GetComponentInChildren<Image>();
+
+        StartCoroutine(Shining());
     }
 
     private void Update()
     {
-        
+        type();
+        chain();
     }
 }
