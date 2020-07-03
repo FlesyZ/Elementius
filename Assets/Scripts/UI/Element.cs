@@ -20,7 +20,7 @@ namespace UI
         private Image typeStored;
         private bool fade;
 
-        private void type()
+        private void Type()
         {
             switch (stored)
             {
@@ -53,7 +53,7 @@ namespace UI
             }
         }
 
-        private void chain()
+        private void Chain()
         {
             chained = 0;
             for (int i = ID; i >= 0; i--)
@@ -67,6 +67,18 @@ namespace UI
                 Element target = GameObject.Find("Slot (" + i + ")").GetComponent<Element>();
                 if (target.stored != stored) break;
                 if (stored != 0 && i != ID) chained++;
+            }
+        }
+
+        public void Base(int n)
+        {
+            if (ID < n)
+            {
+                gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.7f);
+            }
+            else
+            {
+                gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
             }
         }
 
@@ -112,8 +124,8 @@ namespace UI
 
         private void Update()
         {
-            type();
-            chain();
+            Type();
+            Chain();
         }
     }
 }
