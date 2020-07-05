@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ public class Stats : MonoBehaviour
     private Image[] HP = new Image[3];
     private Image[] maxHP = new Image[3];
 
-    private UI.Numbers nHp, nMax;
+    public UI.Numbers nHp, nMax;
 
     private UI.Heart heart;
 
@@ -36,11 +37,8 @@ public class Stats : MonoBehaviour
     #region events
     private void Awake()
     {
-        HP = GameObject.Find("Health Value").GetComponentsInChildren<Image>();
-        maxHP = GameObject.Find("Max Health Value").GetComponentsInChildren<Image>();
-
-        nHp = GameObject.Find("Health Value").GetComponent<UI.Numbers>();
-        nMax = GameObject.Find("Max Health Value").GetComponent<UI.Numbers>();
+        HP = nHp.GetComponentsInChildren<Image>();
+        maxHP = nMax.GetComponentsInChildren<Image>();
 
         heart = GameObject.Find("Heart").GetComponent<UI.Heart>();
     }
@@ -66,6 +64,7 @@ public class Stats : MonoBehaviour
     #endregion
 
     #region method
+    #region Health
     /// <summary>
     /// 血量判別
     /// </summary>
@@ -78,14 +77,25 @@ public class Stats : MonoBehaviour
         hp_hundreds = hp_Temp / 100 % 10;
         hp_thousands = hp_Temp / 1000;
 
+        int temp = Mathf.Abs(hp - hp_Temp);
         if (hp > hp_Temp)
         {
-            hp_Temp++;
+            if (temp > 256)
+                hp_Temp += 168;
+            else if (temp > 16)
+                hp_Temp += 12;
+            else
+                hp_Temp++;
             HPdisplay();
         }
         else if (hp < hp_Temp)
         {
-            hp_Temp--;
+            if (temp > 256)
+                hp_Temp -= 168;
+            else if (temp > 16)
+                hp_Temp -= 12;
+            else
+                hp_Temp--;
             HPdisplay();
         }
         
@@ -147,7 +157,7 @@ public class Stats : MonoBehaviour
     /// <param name="s">使用素材</param>
     private void HPdisplay(int temp, int x, int y, int z, int k, Image[] i, UI.Numbers s)
     {
-        if (temp < 10000)
+        if (temp < 10000 && temp >= 0)
         {
             i[3].sprite = s.numbers[x];
             i[2].sprite = s.numbers[y];
@@ -179,6 +189,7 @@ public class Stats : MonoBehaviour
             i[0].color = new Color(i[0].color.r, i[0].color.g, i[0].color.b, 1);
         }   
     }
+    #endregion
 
     #region Element
     /// <summary>
@@ -190,15 +201,237 @@ public class Stats : MonoBehaviour
         ElementDisplay();
     }
 
+    #region Get Element
+    /// <summary>
+    /// 獲取元素
+    /// </summary>
+    /// <param name="count">獲取數量</param>
+    public void ElementGet(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (eStored.Count < 32)
+                eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
+        }
+    }
+
+    /// <summary>
+    /// 獲取單顆元素
+    /// </summary>
+    public void ElementGet()
+    {
+        ElementGet(1);
+    }
+
+    /// <summary>
+    /// 獲取指定元素
+    /// </summary>
+    /// <param name="count">獲取數量</param>
+    /// <param name="type">指定元素</param>
+    public void ElementGet(int count, Elements type)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (eStored.Count < 32)
+                eStored.Add(type);
+        }
+    }
+    
+    /// <summary>
+    /// 獲取單顆指定元素
+    /// </summary>
+    /// <param name="type"></param>
+    public void ElementGet(Elements type)
+    {
+        if (eStored.Count < 32)
+            eStored.Add(type);
+    }
+    #endregion
+
+    #region Lose Element
+    /// <summary>
+    /// 失去元素
+    /// </summary>
+    /// <param name="count">失去數量</param>
+    public void ElementLoss(int count)
+    {
+        bool[] lost = new bool[eStored.Count];
+        int n;
+
+        if (eStored.Count != 0)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                n = UnityEngine.Random.Range(0, eStored.Count);
+                while (true)
+                {
+                    if (!lost[n])
+                    {
+                        lost[n] = true;
+                        break;
+                    }
+                    else
+                    {
+                        n++;
+                        if (n >= eStored.Count) n = 0;
+                    }
+                }
+            }
+            ElementRemove(lost);
+        }
+    }
+
+    /// <summary>
+    /// 失去單顆元素
+    /// </summary>
+    public void ElementLoss()
+    {
+        ElementLoss(1);
+    }
+
+    /// <summary>
+    /// 失去指定元素
+    /// </summary>
+    /// <param name="count">失去數量</param>
+    /// <param name="type">指定元素</param>
+    public void ElementLoss(int count, Elements type)
+    {
+        bool[] lost = new bool[eStored.Count];
+        List<int> index = new List<int>();
+        int n;
+        
+        if (eStored.Count != 0)
+        {
+            for (int i = 0; i < eStored.Count; i++)
+            {
+                if (eStored[i] == type)
+                {
+                    index.Add(eStored.FindIndex(i, x => x == type));
+                }
+            }
+
+            if (index.Count != 0)
+            {
+                if (count > index.Count) count = index.Count;
+                bool[] remove = new bool[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    n = UnityEngine.Random.Range(0, index.Count);
+                    while (true)
+                    {
+                        if (!remove[n])
+                        {
+                            remove[n] = true;
+                            break;
+                        }
+                        else
+                        {
+                            n++;
+                            if (n >= index.Count) n = 0;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < index.Count; i++)
+                {
+                    if (remove[i] == true) lost[index[i]] = true;
+                }
+
+                ElementRemove(lost);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 失去單顆指定元素
+    /// </summary>
+    /// <param name="type">指定元素</param>
+    public void ElementLoss(Elements type)
+    {
+        bool[] lost = new bool[eStored.Count];
+        List<int> index = new List<int>();
+        
+        if (eStored.Count != 0)
+        {
+            for (int i = 0; i < eStored.Count; i++)
+            {
+                if (eStored[i] == type)
+                {
+                    index.Add(eStored.FindIndex(i, x => x == type));
+                }
+            }
+
+            if (index.Count != 0)
+            {
+                bool[] remove = new bool[index.Count];
+                remove[UnityEngine.Random.Range(0, index.Count)] = true;
+
+                for (int i = 0; i < index.Count; i++)
+                {
+                    if (remove[i] == true) lost[index[i]] = true;
+                }
+
+                ElementRemove(lost);
+            }
+        }
+    }
+    #endregion
+
+    /// <summary>
+    /// 元素消耗
+    /// </summary>
+    /// <param name="consume">元素消耗判斷</param>
+    public void ElementRemove(bool[] consume)
+    {
+        for (int i = consume.Length - 1; i >= 0; i--)
+        {
+            if (consume[i]) eStored.RemoveAt(i);
+        }
+        ElementDisplay();
+    }
+
+    /// <summary>
+    /// 元素顯示
+    /// </summary>
+    private void ElementDisplay()
+    {
+        UI.Element[] slots = GameObject.FindGameObjectWithTag("Player").GetComponentsInChildren<UI.Element>();
+
+        if (e_Temp != elements)
+        {
+            for (int i = 0; i < eStored.Count; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                {
+                    if (slots[j].ID == i)
+                    {
+                        slots[j].stored = eStored[i];
+                    }
+                    else if (slots[j].ID >= elements)
+                    {
+                        slots[j].stored = 0;
+                    }
+
+                }
+            }
+            e_Temp = elements;
+        }
+
+        for (int i = 0; i < 32; i++)
+        {
+            slots[i].Base(eSlots);
+        }
+    }
+
     /// <summary>
     /// 元素條件判斷
     /// </summary>
     public Tuple<bool[], int> ElementCondition(List<Elements> E, List<int> count, List<bool> isChained)
     {
-        List<int> needed = new List<int>();
         bool[] condition = new bool[count.Count];
-        
-        UI.Element[] slots = GameObject.FindObjectsOfType<UI.Element>();
+
+        UI.Element[] slots = GameObject.FindGameObjectWithTag("Player").GetComponentsInChildren<UI.Element>();
         bool[] judged = new bool[eStored.Count];
         int[] chain = new int[eStored.Count];
         int chained = 0;
@@ -223,21 +456,21 @@ public class Stats : MonoBehaviour
             {
                 if (isChained[i])
                     chained = chain[e];
-                if (eStored[e] == E[i])
+                if (eStored[e] == E[i] && !judged[e])
                 {
                     // 判斷是否連鎖 以及連鎖數是否相同
-                    if (isChained[i] && chain[e] == needed[i])
+                    if (isChained[i] && chain[e] == count[i])
                     {
                         chained--;
                         judged[e] = true;
                     }
                     else if (!isChained[i])
                     {
-                        needed[i]--;
+                        count[i]--;
                         judged[e] = true;
                     }
-                    
-                    if (needed[i] == 0 || (isChained[i] && chained == 0))
+
+                    if (count[i] == 0 || (isChained[i] && chained == 0))
                     {
                         condition[i] = true;
                         break;
@@ -248,59 +481,14 @@ public class Stats : MonoBehaviour
 
         // 判斷所需元素條件是否完全符合
         int skill = condition.Length;
-        for (int i = 0; i < skill; i++)
+        foreach (var item in condition)
         {
-            if (condition[i]) skill--;
+            if (item) skill--;
         }
+
 
         // 回傳是否成功 (skill == 0)
         return new Tuple<bool[], int>(judged, skill);
-    }
-
-    /// <summary>
-    /// 元素消耗
-    /// </summary>
-    /// <param name="consume">元素消耗判斷</param>
-    public void ElementConsume(bool[] consume)
-    {
-        for (int i = consume.Length - 1; i >= 0; i--)
-        {
-            if (consume[i]) eStored.RemoveAt(i);
-        }
-        ElementDisplay();
-    }
-
-    /// <summary>
-    /// 元素顯示
-    /// </summary>
-    private void ElementDisplay()
-    {
-        UI.Element[] slots = GameObject.FindObjectsOfType<UI.Element>();
-
-        if (e_Temp != elements)
-        {
-            for (int i = 0; i < eStored.Count; i++)
-            {
-                for (int j = 0; j < 32; j++)
-                {
-                    if (slots[j].ID == i)
-                    {
-                        slots[j].stored = eStored[i];
-                    }
-                    else if (slots[j].ID >= elements)
-                    {
-                        slots[j].stored = 0;
-                    }
-                    
-                }
-            }
-            e_Temp = elements;
-        }
-        
-        for (int i = 0; i < 32; i++)
-        {
-            slots[i].Base(eSlots);
-        }
     }
     #endregion
 

@@ -54,21 +54,22 @@ public class Skills : MonoBehaviour
                 needed.Add(count);
             }
         }
-        /*
+        
         for (int i = 0; i < E.Count; i++)
         {
             print("Detected: " + E[i] + " x " + needed[i] + (isChained[i] ? "(chained)" : ""));
         }
-        */
+        
         var result = stat.ElementCondition(E, needed, isChained);
         if (result.Item2 == 0)
         {
-            stat.ElementConsume(result.Item1);
+            stat.ElementRemove(result.Item1);
             print("發動成功!");
         }
         else
         {
             print("發動失敗!");
+            Debug.Log(result.Item2);
         }
     }
 

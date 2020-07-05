@@ -92,7 +92,18 @@ namespace UI
                 }
                 else if (stored == Elements.Iridescent)
                 {
-                    yield return new WaitForSeconds(0.05f);
+                    typeStored.CrossFadeColor(new Color(1f, 0f, 0f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    typeStored.CrossFadeColor(new Color(1f, 1f, 0f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    typeStored.CrossFadeColor(new Color(0f, 1f, 0f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    typeStored.CrossFadeColor(new Color(0f, 1f, 1f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    typeStored.CrossFadeColor(new Color(0f, 0f, 1f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
+                    typeStored.CrossFadeColor(new Color(1f, 0f, 1f, 1f), 1f, false, true);
+                    yield return new WaitForSeconds(1f);
                 }
                 else
                 {
