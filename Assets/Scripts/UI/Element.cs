@@ -46,6 +46,7 @@ namespace UI
                     typeStored.color = new Color(1f, 1f, 1f, 0.5f);
                     break;
                 case Elements.Iridescent:
+                    typeStored.color = new Color(1f, 1f, 1f, 0.9f);
                     break;
                 case Elements.Dark:
                     typeStored.color = new Color(0f, 0f, 0f, 0.5f);
@@ -92,32 +93,38 @@ namespace UI
                 }
                 else if (stored == Elements.Iridescent)
                 {
-                    typeStored.CrossFadeColor(new Color(1f, 0f, 0f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
-                    typeStored.CrossFadeColor(new Color(1f, 1f, 0f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
-                    typeStored.CrossFadeColor(new Color(0f, 1f, 0f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
-                    typeStored.CrossFadeColor(new Color(0f, 1f, 1f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
-                    typeStored.CrossFadeColor(new Color(0f, 0f, 1f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
-                    typeStored.CrossFadeColor(new Color(1f, 0f, 1f, 1f), 1f, false, true);
-                    yield return new WaitForSeconds(1f);
+                    for (int i = 0; i <= 5; i++)
+                    {
+                        Color irid = new Color(0f, 0f, 0f, 0.8f);
+                        if (i == 2 || i == 3 || i == 4)
+                            irid.r = 1f;
+                        else
+                            irid.r = 0f;
+                        if (i == 4 || i == 5 || i == 0)
+                            irid.g = 1f;
+                        else
+                            irid.g = 0f;
+                        if (i == 0 || i == 1 || i == 2)
+                            irid.b = 1f;
+                        else
+                            irid.b = 0f;
+                        typeStored.CrossFadeColor(irid, 0.8f, false, true);
+                        yield return new WaitForSecondsRealtime(1f);
+                    }
                 }
                 else
                 {
                     if (fade)
                     {
-                        typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 0.8f), 2f, false, true);
-                        yield return new WaitForSeconds(2f);
+                        typeStored.CrossFadeAlpha(0.5f, 2f, false);
                         fade = false;
+                        yield return new WaitForSecondsRealtime(2f);
                     }
                     else
                     {
-                        typeStored.CrossFadeColor(new Color(typeStored.color.r, typeStored.color.g, typeStored.color.b, 1f), 1f, false, true);
-                        yield return new WaitForSeconds(1f);
+                        typeStored.CrossFadeAlpha(0.8f, 1f, false);
                         fade = true;
+                        yield return new WaitForSecondsRealtime(2f);
                     }
                 }
             }
