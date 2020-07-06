@@ -32,7 +32,7 @@ public class Stats : MonoBehaviour
     private float rElapse;
 
     private int hp_Temp, maxHp_Temp, hp_Stat, e_Temp;
-    private int hp_units, hp_tens, hp_hundreds, hp_thousands, maxHp_units, maxHp_tens, maxHp_hundreds, maxHp_thousands;
+    private int hp_units, hp_tens, hp_hundreds, maxHp_units, maxHp_tens, maxHp_hundreds;
 
     #region events
     private void Awake()
@@ -74,8 +74,7 @@ public class Stats : MonoBehaviour
 
         hp_units = hp_Temp % 10;
         hp_tens = hp_Temp / 10 % 10;
-        hp_hundreds = hp_Temp / 100 % 10;
-        hp_thousands = hp_Temp / 1000;
+        hp_hundreds = hp_Temp / 100;
 
         int temp = Mathf.Abs(hp - hp_Temp);
         if (hp > hp_Temp)
@@ -99,18 +98,17 @@ public class Stats : MonoBehaviour
             HPdisplay();
         }
         
-        HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, hp_thousands, HP, nHp);
+        HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, HP, nHp);
 
         maxHp_units = maxHp_Temp % 10;
         maxHp_tens = maxHp_Temp / 10 % 10;
-        maxHp_hundreds = maxHp_Temp / 100 % 10;
-        maxHp_thousands = maxHp_Temp / 1000;
+        maxHp_hundreds = maxHp_Temp / 100;
 
         if (maxHp > maxHp_Temp)
             maxHp_Temp++;
         else if (maxHp < maxHp_Temp)
             maxHp_Temp--;
-        HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, maxHp_thousands, maxHP, nMax);
+        HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, maxHP, nMax);
     }
 
     /// <summary>
@@ -155,14 +153,13 @@ public class Stats : MonoBehaviour
     /// <param name="z">百位數</param>
     /// <param name="i">套用圖片</param>
     /// <param name="s">使用素材</param>
-    private void HPdisplay(int temp, int x, int y, int z, int k, Image[] i, UI.Numbers s)
+    private void HPdisplay(int temp, int x, int y, int z, Image[] i, UI.Numbers s)
     {
-        if (temp < 10000 && temp >= 0)
+        if (temp < 1000 && temp >= 0)
         {
-            i[3].sprite = s.numbers[x];
-            i[2].sprite = s.numbers[y];
-            i[1].sprite = s.numbers[z];
-            i[0].sprite = s.numbers[k];
+            i[2].sprite = s.numbers[x];
+            i[1].sprite = s.numbers[y];
+            i[0].sprite = s.numbers[z];
         }
         else
             for (int n = 0; n < i.Length; n++)
@@ -170,22 +167,20 @@ public class Stats : MonoBehaviour
                 i[n].sprite = s.unknown;
             }
 
-        if (k == 0 && z == 0 && y == 0)
-            i[2].color = new Color(i[2].color.r, i[2].color.g, i[2].color.b, 0);
-        else
-            i[2].color = new Color(i[2].color.r, i[2].color.g, i[2].color.b, 1);
-        if (k == 0 && z == 0)
+        if (z == 0 && y == 0)
             i[1].color = new Color(i[1].color.r, i[1].color.g, i[1].color.b, 0);
         else
             i[1].color = new Color(i[1].color.r, i[1].color.g, i[1].color.b, 1);
-        if (k == 0)
+        if (z == 0)
         {
             i[0].GetComponentInParent<GridLayoutGroup>().cellSize = new Vector2(52f, 96f);
+            i[0].GetComponentInParent<GridLayoutGroup>().spacing = new Vector2(0f, 0f);
             i[0].color = new Color(i[0].color.r, i[0].color.g, i[0].color.b, 0);
         }   
         else
         {
-            i[0].GetComponentInParent<GridLayoutGroup>().cellSize = new Vector2(42f, 96f);
+            i[0].GetComponentInParent<GridLayoutGroup>().cellSize = new Vector2(39f, 72f);
+            i[0].GetComponentInParent<GridLayoutGroup>().spacing = new Vector2(-4f, 0f);
             i[0].color = new Color(i[0].color.r, i[0].color.g, i[0].color.b, 1);
         }   
     }
@@ -396,7 +391,7 @@ public class Stats : MonoBehaviour
     /// </summary>
     private void ElementDisplay()
     {
-        UI.Element[] slots = GameObject.FindGameObjectWithTag("Player").GetComponentsInChildren<UI.Element>();
+        UI.Element[] slots = gameObject.GetComponentsInChildren<UI.Element>();
 
         if (e_Temp != elements)
         {
@@ -499,11 +494,17 @@ public class Stats : MonoBehaviour
 
         if (rElapse == 0)
         {
-            hp += (int)((float)maxHp * 0.01f);
+            hp += (int)(maxHp * 0.01f);
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
             rElapse = 50f / recovery;
         }
+    }
+
+    public void Damage(int dmg, Transform trans)
+    {
+        hp -= dmg;
+
     }
     #endregion
 }
