@@ -95,7 +95,7 @@ namespace UI
                 {
                     for (int i = 0; i <= 5; i++)
                     {
-                        Color irid = new Color(0f, 0f, 0f, 0.8f);
+                        Color irid = new Color(0f, 0f, 0f, 0.9f);
                         if (i == 2 || i == 3 || i == 4)
                             irid.r = 1f;
                         else
@@ -108,8 +108,8 @@ namespace UI
                             irid.b = 1f;
                         else
                             irid.b = 0f;
-                        typeStored.CrossFadeColor(irid, 0.8f, false, true);
-                        yield return new WaitForSecondsRealtime(1f);
+                        typeStored.CrossFadeColor(irid, 0.5f, false, true);
+                        yield return new WaitForSecondsRealtime(0.5f);
                     }
                 }
                 else

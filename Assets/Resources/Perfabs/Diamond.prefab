@@ -135,5 +135,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawn: {fileID: 2118772175104057787, guid: b2d0c69619733fa4b9cc5fd75d1d3d98, type: 3}
   spawnItem: {fileID: 1027463799988741149}
-  SpawnTime: 0
+  SpawnTime: 5
   effect: Iridescent

@@ -21,7 +21,7 @@ public class Item : Items
                 r.AddForce(Vector2.up);
             else
                 r.AddForce(Vector2.down);
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSecondsRealtime(5f);
         }
     }
 
@@ -29,6 +29,7 @@ public class Item : Items
     {
         pos = transform.position;
         r = GetComponent<Rigidbody2D>();
+        if (SpawnTime > 0f) spawn = GameObject.FindObjectOfType<Spawner>();
     }
 
     private void Start()
@@ -39,7 +40,6 @@ public class Item : Items
     private void OnTriggerEnter2D(Collider2D other)
     {
         ItemEffect(effect, other);
-        Respawn(SpawnTime);
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 }

@@ -42,6 +42,11 @@ public class Player : MonoBehaviour
         return new Tuple<List<string>, List<float>>(a, timer);
     }
 
+    private void Death()
+    {
+        a.SetTrigger("Death");
+    }
+
     #region events
     private void Start()
     {

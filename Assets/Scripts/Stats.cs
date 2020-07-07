@@ -59,7 +59,7 @@ public class Stats : MonoBehaviour
     {
         Health();
         Element();
-        Recovery();
+        if (hp > 0) Recovery();
     }
     #endregion
 
@@ -95,8 +95,8 @@ public class Stats : MonoBehaviour
                 hp_Temp -= 12;
             else
                 hp_Temp--;
-            HPdisplay();
         }
+        HPdisplay();
         
         HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, HP, nHp);
 
@@ -116,7 +116,7 @@ public class Stats : MonoBehaviour
     /// </summary>
     private void HPdisplay()
     {
-        if (hp != hp_Temp)
+        if (hp != hp_Temp || hp_Stat <= 1 || hp <= 3 && hp >= 1)
             for (int i = 0; i < HP.Length; i++)
             {
                 HP[i].transform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-5.0f, 5.0f));
@@ -504,7 +504,12 @@ public class Stats : MonoBehaviour
     public void Damage(int dmg, Transform trans)
     {
         hp -= dmg;
+        if (hp <= 0) Death();
+    }
 
+    public void Death()
+    {
+        ElementLoss(3);
     }
     #endregion
 }

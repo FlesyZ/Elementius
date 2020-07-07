@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class Items : MonoBehaviour
 {
-    [Header("重生物件")]
-    public Spawnable spawn;
-    public GameObject spawnItem;
-
+    [Header("重生判斷")]
+    public Spawner spawn;
+    
     [Header("重生時間"), Range(0, 20)]
     public float SpawnTime = 0f;
 
@@ -27,11 +27,14 @@ public class Items : MonoBehaviour
 
     public void Respawn(float time)
     {
-        if (SpawnTime == 0f)
-        {
-            spawn.RespawnObject = spawnItem;
-            spawn.RespawnTime = time;
-            Instantiate(spawn, gameObject.transform.position, Quaternion.identity);
-        }
+        if (gameObject.name.Contains("(Clone)")) 
+            gameObject.name = gameObject.name.Replace("(Clone)", "");
+        spawn.spawning.Add(gameObject.name);
+        spawn.spawnTime.Add(time); 
+    }
+
+    private void OnDestroy()
+    {
+        if (SpawnTime > 0f) Respawn(SpawnTime);
     }
 }
