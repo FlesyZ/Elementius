@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,22 +13,32 @@ public class Stats : MonoBehaviour
     private UI.Heart heart;
 
     [Header("血量"), Range(0, 9999)]
-    public int hp = 20;
+    public int hp;
 
     private int maxH;
     public int maxHp { get { return maxH; } set { maxH = value; } }
 
     [Header("元素值"), Range(0, 32)]
-    public int elements = 7;
+    public int elements;
     private List<Elements> eStored = new List<Elements>();
 
     private int eSlot;
     public int eSlots { get { return eSlot; } set { eSlot = value; } }
 
     [Header("流動係數"), Range(3f, 20f)]
-    public float recovery = 5f;
+    public float recovery;
 
     private float rElapse;
+
+    [Header("能力值")]
+    [Tooltip("攻擊"), Range(1, 99)]
+    public int ATK;
+    [Tooltip("防禦"), Range(1, 99)]
+    public int DEF;
+    [Tooltip("精神"), Range(1, 99)]
+    public int INT;
+    [Tooltip("敏捷"), Range(1, 99)]
+    public int AGI;
 
     private int hp_Temp, maxHp_Temp, hp_Stat, e_Temp;
     private int hp_units, hp_tens, hp_hundreds, maxHp_units, maxHp_tens, maxHp_hundreds;
@@ -45,8 +54,6 @@ public class Stats : MonoBehaviour
 
     private void Start()
     {
-        maxH = hp;
-
         hp_Temp = hp;
         maxHp_Temp = maxHp;
 

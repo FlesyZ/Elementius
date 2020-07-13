@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class LoadData : MonoBehaviour
 {
     void Start()
     {
-    
+        StartEvent.Ready();
     }
 
     void Update()
     {
-        
+
     }
 }
