@@ -18,6 +18,8 @@ public class Stats : MonoBehaviour
     private int maxH;
     public int maxHp { get { return maxH; } set { maxH = value; } }
 
+    public bool isShown;
+
     [Header("元素值"), Range(0, 32)]
     public int elements;
     private List<Elements> eStored = new List<Elements>();
@@ -501,7 +503,7 @@ public class Stats : MonoBehaviour
 
         if (rElapse == 0)
         {
-            hp += (int)(maxHp * 0.01f);
+            hp += (int)Mathf.Ceil(maxHp * 0.01f * (INT / 10));
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
             rElapse = 50f / recovery;
@@ -511,12 +513,11 @@ public class Stats : MonoBehaviour
     public void Damage(int dmg, Transform trans)
     {
         hp -= dmg;
-        if (hp <= 0) Death();
     }
 
-    public void Death()
+    public void ToggleChat()
     {
-        ElementLoss(3);
+        isShown = !isShown;
     }
     #endregion
 }

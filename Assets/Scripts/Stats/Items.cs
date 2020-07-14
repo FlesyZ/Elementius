@@ -18,6 +18,9 @@ public class Items : MonoBehaviour
                 case "Iridescent":
                     x.GetComponent<Player>().stat.ElementGet(Elements.Iridescent);
                     break;
+                case "InitialElementGet":
+                    x.GetComponent<Player>().stat.eSlots += 5;
+                    break;
                 default:
                     break;
             }

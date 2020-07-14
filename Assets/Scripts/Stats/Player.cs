@@ -6,10 +6,14 @@ public class Player : MonoBehaviour
 {
     public Stats stat;
 
+    public bool play = false;
+
     private float Speed = 3.0f;
     private float Jump = 2.5f;
 
     private Animator a;
+    public Animator anim { get { return a; } set { a = value; } }
+
     private Rigidbody2D r;
     private Ground ground;
     private bool isGrounded = false;
@@ -42,20 +46,15 @@ public class Player : MonoBehaviour
         return new Tuple<List<string>, List<float>>(a, timer);
     }
 
-    private void Death()
+    public void Death()
     {
+        stat.ElementLoss(3);
         a.SetTrigger("Death");
+        play = false;
+        r.velocity = new Vector2(0f, 0f);
     }
 
-    #region events
-    private void Start()
-    {
-        a = gameObject.GetComponent<Animator>();
-        r = gameObject.GetComponent<Rigidbody2D>();
-        ground = GameObject.FindObjectOfType<Ground>();
-    }
-
-    private void Update()
+    private void Move()
     {
         var action = InAction(Action, ActionTimer);
         Action = action.Item1;
@@ -119,15 +118,29 @@ public class Player : MonoBehaviour
             ActionTimer.Add(1f);
             Dash = x * Speed * 2f;
         }
-        else if (Input.GetKeyDown(KeyCode.F))
-        {
-            stat.Damage(UnityEngine.Random.Range(8,40), gameObject.transform);
-            a.SetTrigger("Damage");
-            Action.Add("Damage");
-            ActionTimer.Add(0.5f);
-            if (!isGrounded && r.velocity.y >= 0)
-                r.velocity = new Vector2(r.velocity.x, 0f);
-        }
+    }
+
+    public void Attack()
+    {
+
+    }
+
+    #region events
+    private void Start()
+    {
+        
+
+        a = gameObject.GetComponent<Animator>();
+        r = gameObject.GetComponent<Rigidbody2D>();
+        ground = FindObjectOfType<Ground>();
+    }
+
+    private void Update()
+    {
+        if (play)
+            Move();
+        else if (stat.hp == 0)
+            Death();
     }
     #endregion
 }
