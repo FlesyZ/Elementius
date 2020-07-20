@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
         Black = GameObject.Find("BlackScreen").GetComponent<Image>();
         gameover = GameObject.Find("GameOver").GetComponent<Image>();
 
-        gameover.canvasRenderer.SetAlpha(0f);
+        gameover.canvasRenderer.SetAlpha(1f);
         gameover.GetComponent<CanvasGroup>().alpha = 0;
     }
 

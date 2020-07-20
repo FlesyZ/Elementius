@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum Elements
-{
-    None, Brave, Agile, Guard, Origin, Earth, Chaos, Iridescent, Dark = 9
-}
 namespace UI
 {
     public class Element : MonoBehaviour
@@ -17,41 +13,60 @@ namespace UI
         public Elements stored = Elements.None;
         public int chained;
 
+        Color color = new Color(0, 0, 0, 0);
+        Color slot = new Color(1, 1, 1, 0);
+
         private Image typeStored;
         private bool fade;
+
+        private void colorCode(float r, float g, float b)
+        {
+            color.r = r;
+            color.g = g;
+            color.b = b;
+        }
 
         private void Type()
         {
             switch (stored)
             {
                 case Elements.None:
-                    typeStored.color = new Color(0f, 0f, 0f, 0f);
+                    colorCode(0, 0, 0);
                     break;
                 case Elements.Brave:
-                    typeStored.color = new Color(1f, 0f, 0f, 0.5f);
+                    colorCode(1, 0, 0);
                     break;
                 case Elements.Agile:
-                    typeStored.color = new Color(0f, 1f, 0f, 0.5f);
+                    colorCode(0, 1, 0);
                     break;
                 case Elements.Guard:
-                    typeStored.color = new Color(0f, 0f, 1f, 0.5f);
+                    colorCode(0, 0, 1);
                     break;
                 case Elements.Origin:
-                    typeStored.color = new Color(1f, 1f, 0f, 0.5f);
+                    colorCode(1, 1, 0);
                     break;
                 case Elements.Earth:
-                    typeStored.color = new Color(1f, 0f, 1f, 0.5f);
+                    colorCode(1, 0, 1);
                     break;
                 case Elements.Chaos:
-                    typeStored.color = new Color(1f, 1f, 1f, 0.5f);
+                    colorCode(1, 1, 1);
                     break;
                 case Elements.Iridescent:
-                    typeStored.color = new Color(1f, 1f, 1f, 0.9f);
+                    colorCode(1, 1, 1);
                     break;
                 case Elements.Dark:
-                    typeStored.color = new Color(0f, 0f, 0f, 0.5f);
+                    colorCode(0, 0, 0);
                     break;
             }
+
+            if (stored == Elements.Iridescent)
+                color.a = 0.9f;
+            else if (stored == Elements.None)
+                color.a = 0f;
+            else
+                color.a = 0.5f;
+
+            typeStored.color = color;
         }
 
         private void Chain()
@@ -73,23 +88,18 @@ namespace UI
 
         public void Base(int n)
         {
-            if (ID < n)
-            {
-                gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.7f);
-            }
-            else
-            {
-                gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
-            }
+            if (ID < n) slot.a = 0.7f; else slot.a = 0f;
+            gameObject.GetComponent<Image>().color = slot;
         }
 
         private IEnumerator Shining()
         {
+            WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
             while (true)
-            {
+            {   
                 if (stored == Elements.None)
                 {
-                    yield return new WaitForSeconds(0.05f);
+                    wait.waitTime = 0.1f;
                 }
                 else if (stored == Elements.Iridescent)
                 {
@@ -109,7 +119,7 @@ namespace UI
                         else
                             irid.b = 0f;
                         typeStored.CrossFadeColor(irid, 0.5f, false, true);
-                        yield return new WaitForSecondsRealtime(0.5f);
+                        wait.waitTime = 0.5f;
                     }
                 }
                 else
@@ -118,15 +128,16 @@ namespace UI
                     {
                         typeStored.CrossFadeAlpha(0.5f, 2f, false);
                         fade = false;
-                        yield return new WaitForSecondsRealtime(2f);
+                        wait.waitTime = 2f;
                     }
                     else
                     {
                         typeStored.CrossFadeAlpha(0.8f, 1f, false);
                         fade = true;
-                        yield return new WaitForSecondsRealtime(2f);
+                        wait.waitTime = 1f;
                     }
                 }
+                yield return wait;
             }
         }
 

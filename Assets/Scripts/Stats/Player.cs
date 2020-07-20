@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
 
     public void Death()
     {
-        stat.ElementLoss(3);
+        //stat.ElementLoss(3);
         a.SetTrigger("Death");
         play = false;
         r.velocity = new Vector2(0f, 0f);
@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
+        // detect 
         var action = InAction(Action, ActionTimer);
         Action = action.Item1;
         ActionTimer = action.Item2;
@@ -84,7 +85,7 @@ public class Player : MonoBehaviour
         else if (Action.Contains("Attack") || Action.Contains("Damage"))
             r.velocity = new Vector2(0f, r.velocity.y);
         else
-            r.velocity = new Vector2(X * Speed, r.velocity.y);
+            r.velocity = Vector2.Lerp(r.velocity, new Vector2(X * Speed, r.velocity.y), Time.deltaTime * 10f);
 
         float move;
         if (Action.Contains("Dash"))
