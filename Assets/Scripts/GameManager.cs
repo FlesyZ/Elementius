@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        Stats[] stats = FindObjectsOfType<Stats>();
+        StatWithElement[] stats = FindObjectsOfType<StatWithElement>();
         player.AddRange(FindObjectsOfType<Player>());
 
         for (int i = 0; i < player.Count; i++)

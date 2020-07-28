@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Stats stat;
+    public StatWithElement stat;
 
     public bool play = false;
 
@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
 
     public void Death()
     {
-        //stat.ElementLoss(3);
+        stat.ElementLoss(3);
         a.SetTrigger("Death");
         play = false;
         r.velocity = new Vector2(0f, 0f);
@@ -76,16 +76,16 @@ public class Player : MonoBehaviour
         float X = Input.GetAxis("Horizontal");
         float x = Input.GetAxisRaw("Horizontal");
         if (X > 0)
-            gameObject.GetComponent<SpriteRenderer>().flipX = false;
+            transform.eulerAngles = new Vector3(0, 0, 0);
         else if (X < 0)
-            gameObject.GetComponent<SpriteRenderer>().flipX = true;
+            transform.eulerAngles = new Vector3(0, 180, 0);
 
         if (Action.Contains("Dash"))
-            r.velocity = new Vector2(Mathf.Clamp(X * Speed, Dash, Dash), r.velocity.y);
+            r.velocity = new Vector2(Mathf.Clamp(Mathf.Abs(X) * Speed, Dash, Dash), r.velocity.y);
         else if (Action.Contains("Attack") || Action.Contains("Damage"))
             r.velocity = new Vector2(0f, r.velocity.y);
         else
-            r.velocity = Vector2.Lerp(r.velocity, new Vector2(X * Speed, r.velocity.y), Time.deltaTime * 10f);
+            r.velocity = Vector2.Lerp(r.velocity, new Vector2(Mathf.Abs(X) * Speed, r.velocity.y), Time.deltaTime * 10f);
 
         float move;
         if (Action.Contains("Dash"))

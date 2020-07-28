@@ -107,11 +107,11 @@ NavMeshSettings:
     serializedVersion: 2
     agentTypeID: 0
     agentRadius: 0.5
-    agentHeight: 2
+    agentHeight: 3
     agentSlope: 45
-    agentClimb: 0.4
+    agentClimb: 0.5
     ledgeDropHeight: 0
-    maxJumpAcrossDistance: 0
+    maxJumpAcrossDistance: 3
     minRegionArea: 2
     manualCellSize: 0
     cellSize: 0.16666667
@@ -809,7 +809,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &297559521
 Transform:
@@ -6410,7 +6410,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 376475415}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &330394049
 SpriteRenderer:
@@ -6492,14 +6492,14 @@ Transform:
   m_Children:
   - {fileID: 894414219}
   - {fileID: 1466837743}
-  - {fileID: 1388875399}
   - {fileID: 1268244305}
   - {fileID: 330394048}
   - {fileID: 2060680517}
-  - {fileID: 1863479189}
-  - {fileID: 1734869576}
   - {fileID: 1187717241}
   - {fileID: 1982054883}
+  - {fileID: 1388875399}
+  - {fileID: 1863479189}
+  - {fileID: 1734869576}
   - {fileID: 1550642200}
   - {fileID: 1663639956}
   m_Father: {fileID: 1464105521}
@@ -11983,7 +11983,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 376475415}
-  m_RootOrder: 8
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1268244304
 GameObject:
@@ -12014,7 +12014,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 376475415}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1268244306
 SpriteRenderer:
@@ -12230,7 +12230,7 @@ GameObject:
   - component: {fileID: 1388875399}
   - component: {fileID: 1388875400}
   m_Layer: 0
-  m_Name: TX Village Props_13
+  m_Name: sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12249,7 +12249,7 @@ Transform:
   m_Children:
   - {fileID: 1399983014}
   m_Father: {fileID: 376475415}
-  m_RootOrder: 2
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1388875400
 SpriteRenderer:
@@ -12597,7 +12597,7 @@ GameObject:
   - component: {fileID: 1550642200}
   - component: {fileID: 1550642201}
   m_Layer: 0
-  m_Name: TX Village Props_13 (2)
+  m_Name: sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12680,7 +12680,7 @@ GameObject:
   - component: {fileID: 1663639956}
   - component: {fileID: 1663639957}
   m_Layer: 0
-  m_Name: TX Village Props_13 (3)
+  m_Name: sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12854,7 +12854,7 @@ GameObject:
   - component: {fileID: 1734869576}
   - component: {fileID: 1734869577}
   m_Layer: 0
-  m_Name: TX Village Props_13 (1)
+  m_Name: sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12873,7 +12873,7 @@ Transform:
   m_Children:
   - {fileID: 56683950}
   m_Father: {fileID: 376475415}
-  m_RootOrder: 7
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1734869577
 SpriteRenderer:
@@ -13071,7 +13071,7 @@ GameObject:
   - component: {fileID: 1863479189}
   - component: {fileID: 1863479190}
   m_Layer: 0
-  m_Name: TX Village Props_13
+  m_Name: sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13090,7 +13090,7 @@ Transform:
   m_Children:
   - {fileID: 191391602}
   m_Father: {fileID: 376475415}
-  m_RootOrder: 6
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1863479190
 SpriteRenderer:
@@ -13314,7 +13314,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 376475415}
-  m_RootOrder: 9
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2000046578
 GameObject:
@@ -13482,7 +13482,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 376475415}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2060680518
 SpriteRenderer:
@@ -13613,6 +13613,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1131052735, guid: d0ea05e0bd97fbe4ca8f1eb9f2ba7df1, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3730157984156270129, guid: d0ea05e0bd97fbe4ca8f1eb9f2ba7df1,
+        type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3730157984156270133, guid: d0ea05e0bd97fbe4ca8f1eb9f2ba7df1,
         type: 3}
       propertyPath: m_Name

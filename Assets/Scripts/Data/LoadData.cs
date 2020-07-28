@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class LoadData : MonoBehaviour
 {
-    private Stats[] stats;
+    private StatWithElement[] stats;
     void Start()
     {
         //StartEvent.Ready();
-        stats = FindObjectsOfType<Stats>();
+        stats = FindObjectsOfType<StatWithElement>();
 
         foreach (var item in stats)
         {

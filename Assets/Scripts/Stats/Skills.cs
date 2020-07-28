@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Skills : MonoBehaviour
 {
-    public Stats stat;
+    public StatWithElement stat;
 
     /// <summary>
     /// 需要的元素數量
