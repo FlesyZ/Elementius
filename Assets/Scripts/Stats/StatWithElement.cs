@@ -9,6 +9,7 @@ public class StatWithElement : StatGeneral
     [Header("元素值"), Range(0, 32)]
     public int elements;
     private List<Elements> eStored = new List<Elements>();
+    public Elements eKeep { get; set; }
 
     private int eSlot;
     public int eSlots { get { return eSlot; } set { eSlot = value; } }
@@ -214,6 +215,15 @@ public class StatWithElement : StatGeneral
         }
     }
     #endregion
+
+    public void ElementAbsorption()
+    {
+        if (eStored.Count != 0)
+        {
+            eKeep = eStored[0];
+            eStored.RemoveAt(0);
+        }
+    }
 
     /// <summary>
     /// 元素消耗

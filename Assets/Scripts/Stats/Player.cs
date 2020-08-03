@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
     private List<string> Action = new List<string>();
     private List<float> ActionTimer = new List<float>();
     private float Dash;
+    private float AbsorbTimer;
+    private bool Absorbed;
 
     private Tuple<List<string>, List<float>> InAction(List<string> a, List<float> timer)
     {
@@ -112,12 +114,31 @@ public class Player : MonoBehaviour
             Action.Add("Attack");
             ActionTimer.Add(1.25f);
         }
-        else if (Input.GetKeyDown(KeyCode.LeftShift) && !Action.Contains("Dash"))
+        else if (Input.GetKeyDown(KeyCode.LeftShift) && !Action.Contains("Dash") && X != 0)
         {
             a.SetTrigger("Dash");
             Action.Add("Dash");
             ActionTimer.Add(1f);
             Dash = x * Speed * 2f;
+        }
+        else if (Input.GetKey(KeyCode.LeftShift) && X == 0 && !Absorbed)
+        {
+            AbsorbTimer += Time.deltaTime;
+            if (AbsorbTimer >= 0.5f)
+            {
+                stat.ElementAbsorption();
+                Absorbed = true;
+            }
+        }
+
+        if (Absorbed || !Input.GetKey(KeyCode.LeftShift) && AbsorbTimer > 0)
+        {
+            AbsorbTimer -= Time.deltaTime;
+            if (AbsorbTimer <= 0)
+            {
+                AbsorbTimer = 0;
+                Absorbed = false;
+            }
         }
     }
 
