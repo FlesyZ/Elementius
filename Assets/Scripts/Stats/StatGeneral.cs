@@ -39,8 +39,8 @@ public class StatGeneral : MonoBehaviour
     #region events
     void Awake()
     {
-        HP = nHp.GetComponentsInChildren<Image>();
-        maxHP = nMax.GetComponentsInChildren<Image>();
+        if (nHp != null) HP = nHp.GetComponentsInChildren<Image>();
+        if (nMax != null) maxHP = nMax.GetComponentsInChildren<Image>();
 
         heart = GameObject.Find("Heart").GetComponent<UI.Heart>();
     }
@@ -82,7 +82,8 @@ public class StatGeneral : MonoBehaviour
                 hp_Temp += 12;
             else
                 hp_Temp++;
-            HPdisplay();
+            if (nHp != null)
+                HPdisplay();
         }
         else if (hp < hp_Temp)
         {
@@ -93,9 +94,8 @@ public class StatGeneral : MonoBehaviour
             else
                 hp_Temp--;
         }
-        HPdisplay();
+        
 
-        HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, HP, nHp);
 
         maxHp_units = maxHp_Temp % 10;
         maxHp_tens = maxHp_Temp / 10 % 10;
@@ -105,7 +105,14 @@ public class StatGeneral : MonoBehaviour
             maxHp_Temp++;
         else if (maxHp < maxHp_Temp)
             maxHp_Temp--;
-        HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, maxHP, nMax);
+
+        if (nHp != null && nMax != null)
+        {
+            HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, HP, nHp);
+            HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, maxHP, nMax);
+
+            HPdisplay();
+        }
     }
 
     /// <summary>

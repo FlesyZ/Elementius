@@ -5,7 +5,8 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public StatGeneral stat;
-    public Animator anim;
+    public Animator anim { get; set; }
+    public Rigidbody2D body { get; private set; }
 
     [Header("獲得物品/經驗")]
     public float XP;
@@ -13,11 +14,24 @@ public class Enemy : MonoBehaviour
     [Range(0f, 1f)]
     public float getChance = 0.5f;
 
+    Vector2 move;
+    RaycastHit2D onGround;
     bool dead;
 
-    // Update is called once per frame
+    void Awake()
+    {
+        stat = GetComponent<StatGeneral>();
+
+        body = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        onGround = Physics2D.Raycast(transform.position, (Vector2)transform.position + (Vector2.down + Vector2.right * 0.7f) * 1.2f);
+        move = Vector2.right * 1f;
+    }
+
     void Update()
     {
+        body.velocity = move;
+
         if (stat.hp <= 0 && !dead)
             Death();
     }
@@ -40,5 +54,24 @@ public class Enemy : MonoBehaviour
         }
         Destroy(gameObject, 1f);
         dead = true;
+    }
+
+    private void OnTriggerExit2D(Collider2D that)
+    {
+        if (that.CompareTag("Floor") && onGround == gameObject.GetComponent<RaycastHit2D>())
+        {
+            if (transform.rotation.y == 180)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                onGround = Physics2D.Raycast(transform.position, (Vector2)transform.position + (Vector2.down + Vector2.left * 0.7f) * 1.2f);
+                move = Vector2.left * 1f;
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(0, 180, 0);
+                onGround = Physics2D.Raycast(transform.position, (Vector2)transform.position + (Vector2.down + Vector2.right * 0.7f) * 1.2f);
+                move = Vector2.right * 1f;
+            }
+        }
     }
 }

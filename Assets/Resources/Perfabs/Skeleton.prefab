@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 3052666046610721842}
   - component: {fileID: 3052666046610721845}
   - component: {fileID: 3052666046610721844}
+  - component: {fileID: 6787936318364347715}
+  - component: {fileID: 5049530010653668177}
   m_Layer: 0
   m_Name: Skeleton
   m_TagString: Untagged
@@ -141,3 +143,42 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &6787936318364347715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3052666046610721847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47f6160fd8634b249beacb4c4ffd5558, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stat: {fileID: 0}
+  anim: {fileID: 0}
+  body: {fileID: 0}
+  XP: 0
+  itemGet: []
+  getChance: 0.5
+--- !u!114 &5049530010653668177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3052666046610721847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f047f9b030523aa449fe53d2f90946ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nHp: {fileID: 0}
+  nMax: {fileID: 0}
+  hp: 0
+  isShown: 0
+  recovery: 0
+  ATK: 0
+  DEF: 0
+  INT: 0
+  AGI: 0
