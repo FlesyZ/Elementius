@@ -14,10 +14,17 @@ public class StatWithElement : StatGeneral
     private int eSlot;
     public int eSlots { get { return eSlot; } set { eSlot = value; } }
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+    }
+
     protected override void Start()
     {
-        base.Start();
+        Health();
         eSlot = elements;
+        if (hp > 0) Recovery();
     }
 
     protected override void FixedUpdate()
@@ -341,9 +348,13 @@ public class StatWithElement : StatGeneral
 
     protected override void Recovery()
     {
-        base.Recovery();
+        rElapse -= Time.deltaTime;
+        rElapse = Mathf.Clamp(rElapse, 0, 50f / recovery);
+
         if (rElapse == 0)
         {
+            hp += (int)Mathf.Ceil(maxHp * 0.01f * (INT / 10));
+            rElapse = 50f / recovery;
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
         }

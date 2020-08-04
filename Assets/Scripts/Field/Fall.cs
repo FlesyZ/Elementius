@@ -10,7 +10,7 @@ public class Fall : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<Player>().stat.Damage(Random.Range(5, 8), other.transform);
+            StartCoroutine(other.GetComponent<Player>().stat.Damage(Random.Range(5, 8), other.transform, Elements.None));
             if (other.GetComponent<Player>().stat.hp > 0)
                 other.transform.position = respawn;
             else

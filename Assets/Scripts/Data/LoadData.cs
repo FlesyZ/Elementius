@@ -19,6 +19,7 @@ public class LoadData : MonoBehaviour
             item.DEF = 5;
             item.INT = 3;
             item.AGI = 5;
+            item.recovery = 7;
         }
 
         SceneManager.LoadScene("TestLevel");

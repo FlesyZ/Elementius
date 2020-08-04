@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     private Animator a;
     public Animator anim { get { return a; } set { a = value; } }
 
+    public Collider2D attack { get; set; }
+
     private Rigidbody2D r;
     private Ground ground;
     private bool isGrounded = false;
@@ -86,9 +88,11 @@ public class Player : MonoBehaviour
             r.velocity = new Vector2(Mathf.Clamp(X * Speed, Dash, Dash), r.velocity.y);
         else if (X != 0)
             r.velocity = Vector2.Lerp(r.velocity, new Vector2(X * Speed, r.velocity.y), Time.deltaTime * 10f);
-        else if (Action.Contains("Attack") || Action.Contains("Damage") || x == 0)
+        else if (x == 0)
             r.velocity = new Vector2(0f, r.velocity.y);
-        
+        else if (Action.Contains("Attack") || Action.Contains("Damage"))
+            r.velocity = new Vector2(0f, r.velocity.y);
+
         float move;
         if (Action.Contains("Dash"))
             move = Mathf.Clamp(Mathf.Abs(r.velocity.x), 3f, 3f);
@@ -96,7 +100,7 @@ public class Player : MonoBehaviour
             move = Mathf.Clamp(Mathf.Abs(r.velocity.x), 0.1f, Mathf.Abs(r.velocity.x));
         else
             move = r.velocity.x;
-        if (!Action.Contains("Attack") & !Action.Contains("Damage"))
+        if (!Action.Contains("Attack") && !Action.Contains("Damage"))
             a.SetFloat("Move", move);
         a.SetFloat("Air", r.velocity.y);
 
@@ -144,17 +148,19 @@ public class Player : MonoBehaviour
 
     public void Attack()
     {
-
+        attack.enabled = true;
     }
 
     #region events
     private void Start()
     {
-        stat = GameObject.FindObjectOfType<StatWithElement>();
+        stat = FindObjectOfType<StatWithElement>();
+        ground = FindObjectOfType<Ground>();
 
         a = GetComponent<Animator>();
         r = GetComponent<Rigidbody2D>();
-        ground = FindObjectOfType<Ground>();
+
+        attack = GetComponentInChildren<AttackRange>().GetComponent<Collider2D>();
     }
 
     private void Update()

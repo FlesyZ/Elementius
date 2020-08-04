@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class StatGeneral : MonoBehaviour
@@ -21,7 +22,7 @@ public class StatGeneral : MonoBehaviour
     [Header("流動係數"), Range(3f, 20f)]
     public float recovery;
 
-    public float rElapse { get; private set; }
+    public float rElapse { get; protected set; }
 
     [Header("能力值")]
     [Tooltip("攻擊"), Range(1, 99)]
@@ -37,7 +38,7 @@ public class StatGeneral : MonoBehaviour
     private int hp_units, hp_tens, hp_hundreds, maxHp_units, maxHp_tens, maxHp_hundreds;
 
     #region events
-    void Awake()
+    protected virtual void Awake()
     {
         if (nHp != null) HP = nHp.GetComponentsInChildren<Image>();
         if (nMax != null) maxHP = nMax.GetComponentsInChildren<Image>();
@@ -65,7 +66,7 @@ public class StatGeneral : MonoBehaviour
     /// <summary>
     /// 血量判別
     /// </summary>
-    private void Health()
+    protected void Health()
     {
         hp = Mathf.Clamp(hp, 0, maxHp);
 
@@ -202,10 +203,74 @@ public class StatGeneral : MonoBehaviour
         }
     }
 
-    public void Damage(int dmg, Transform trans)
+    public IEnumerator Damage(int dmg, Transform trans, Elements e)
     {
         hp -= dmg;
+
+        GameObject Damage = new GameObject("Damage");
+        Damage.transform.position = (Vector2)trans.position + Vector2.up;
+        
+        TextMesh damage = Damage.AddComponent<TextMesh>();
+        damage.text = dmg.ToString();
+        damage.characterSize = 0.25f;
+        damage.font = Resources.Load("04B_03__") as Font; 
+        damage.GetComponent<MeshRenderer>().material = Resources.Load("04B_03__") as Material;
+        damage.fontSize = 16;
+
+        Color color = Color.white;
+
+        switch (e)
+        {
+            case Elements.Brave:
+                color = Color.red;
+                break;
+            case Elements.Agile:
+                color = Color.green;
+                break;
+            case Elements.Guard:
+                color = Color.blue;
+                color.g = 0.5f;
+                break;
+            case Elements.Origin:
+                color = Color.yellow;
+                break;
+            case Elements.Earth:
+                color.g = 0;
+                break;
+            case Elements.Chaos:
+                color.r = 0.8f;
+                color.g = 0.8f;
+                color.b = 0.8f;
+                break;
+            case Elements.Iridescent:
+                color = Color.cyan;
+                break;
+            case Elements.Dark:
+                color = Color.gray;
+                break;
+        }
+        damage.color = color;
+
+        Renderer renderer = damage.GetComponent<Renderer>();
+        renderer.sortingOrder = 20;
+        
+        Rigidbody2D body = Damage.AddComponent<Rigidbody2D>();
+        body.AddForce(new Vector2(Random.Range(-1f, 1f), 2.5f) * 100f);
+
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
+        Destroy(Damage, 1.5f);
+        yield return wait;
+
+        wait.waitTime = 0.05f;
+        Color fade = new Color(damage.color.r, damage.color.g, damage.color.b, 1);
+        while (damage.color.a != 0)
+        {
+            fade.a -= 0.1f;
+            damage.color = fade;
+            yield return wait;
+        }
     }
+
 
     public void ToggleChat()
     {
