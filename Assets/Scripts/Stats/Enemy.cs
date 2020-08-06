@@ -9,31 +9,50 @@ public class Enemy : MonoBehaviour
     public Animator anim { get; set; }
     public Rigidbody2D body { get; private set; }
 
+    [Header("能力值")]
+    [Tooltip("基礎生命值"), Range(0, 9999)]
+    public int Health = 50;
+    [Tooltip("屬性")]
+    public Elements State = Elements.None;
+    [Tooltip("力量"), Range(0, 99)]
+    public int Strength = 3;
+    [Tooltip("敏捷"), Range(0, 99)]
+    public int Agility = 3;
+    [Tooltip("智力"), Range(0, 99)]
+    public int Intelligence = 3;
+    [Tooltip("幸運"), Range(0, 99)]
+    public int Luck = 3;
+    [Tooltip("流動係數"), Range(0, 20)]
+    public int Recovery = 0;
+
+
     [Header("獲得物品/經驗")]
     public float XP;
     public List<GameObject> itemGet;
     [Range(0f, 1f)]
     public float getChance = 0.5f;
 
-    Vector2 move = Vector2.right;
+    float moveX = 1, moveY = 0;
+    Vector2 Movement { get { return new Vector2(moveX, moveY); } }
     Vector3 point = new Vector2(1, -1f);
     RaycastHit2D onGround;
+    public bool isMoving { get { return !anim.GetBool("IsTakingDamage"); } }
     bool dead;
 
-    public float Move
-    {
-        get
-        {
-            return anim.GetFloat("Move");
-        }
-    }
+    public float Move { get { return anim.GetFloat("Move"); } }
 
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        
-        stat.maxHp = stat.hp;
+
+        stat.MaxHP = Health;
+        stat.data.hp = Health;
+        stat.data.STR = Strength;
+        stat.data.AGI = Agility;
+        stat.data.INT = Intelligence;
+        stat.data.LUK = Luck;
+        stat.data.recovery = Recovery;
     }
 
     void Start()
@@ -47,6 +66,7 @@ public class Enemy : MonoBehaviour
     {
         onGround = Physics2D.Raycast(transform.position, point, 1, 1 << 9);
 
+        // auto rotation
         if (onGround.collider)
         {
             if (transform.rotation.y != 0)
@@ -55,10 +75,14 @@ public class Enemy : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0, 180, 0);
 
             point = new Vector2(point.x * -1f, point.y);
-            move *= -1f;
+            moveX *= -1f;
         }
-        
-        body.velocity = move;
+
+        if (isMoving)
+            body.velocity = Movement;
+        else
+            body.velocity = Vector2.zero;
+
         anim.SetFloat("Move", body.velocity.x);
         
         if (Move > 0)
@@ -68,7 +92,7 @@ public class Enemy : MonoBehaviour
         else
             anim.SetInteger("Moving", 0);
 
-        if (stat.hp <= 0 && !dead)
+        if (stat.HP <= 0 && !dead)
             Death();
     }
 
@@ -93,10 +117,15 @@ public class Enemy : MonoBehaviour
         dead = true;
     }
 
-    public void Damage(int dmg, Elements e)
+    public void StopMoving()
     {
-        StartCoroutine(stat.Damage(dmg, transform, e));
-        anim.SetTrigger("TakeHit");
+        anim.SetBool("IsTakingDamage", true);
+    }
+
+    public void StartMoving()
+    {
+        if (stat.HP > 0)
+            anim.SetBool("IsTakingDamage", false);
     }
 
     private void OnDrawGizmos()

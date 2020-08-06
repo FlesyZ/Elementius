@@ -1,38 +1,35 @@
 ﻿using System.Collections;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class StatGeneral : MonoBehaviour
 {
-    private Image[] HP = new Image[3];
-    private Image[] maxHP = new Image[3];
+    private Image[] hp = new Image[3];
+    private Image[] hpM = new Image[3];
 
     public UI.Numbers nHp, nMax;
 
     private UI.Heart heart;
 
-    [Header("血量"), Range(0, 9999)]
-    public int hp;
+    public Game.States data;
+
+    public int HP { get { return Mathf.Clamp(data.hp, 0, MaxHP); } }
 
     private int maxH;
-    public int maxHp { get { return maxH; } set { maxH = value; } }
+    public int MaxHP { get { return maxH; } set { maxH = value; } }
 
     public bool isShown;
 
-    [Header("流動係數"), Range(3f, 20f)]
-    public float recovery;
+    public float Recover { get { return data.recovery; } }
+
 
     public float rElapse { get; protected set; }
 
-    [Header("能力值")]
-    [Tooltip("攻擊"), Range(1, 99)]
-    public int ATK;
-    [Tooltip("防禦"), Range(1, 99)]
-    public int DEF;
-    [Tooltip("精神"), Range(1, 99)]
-    public int INT;
-    [Tooltip("敏捷"), Range(1, 99)]
-    public int AGI;
+    public int STR { get { return Mathf.Clamp(data.STR, 0, data.STR); } }
+    public int AGI { get { return Mathf.Clamp(data.AGI, 0, data.AGI); } }
+    public int INT { get { return Mathf.Clamp(data.INT, 0, data.INT); } }
+    public int LUK { get { return Mathf.Clamp(data.LUK, 0, data.LUK); } }
 
     private int hp_Temp, maxHp_Temp, hp_Stat;
     private int hp_units, hp_tens, hp_hundreds, maxHp_units, maxHp_tens, maxHp_hundreds;
@@ -40,24 +37,25 @@ public class StatGeneral : MonoBehaviour
     #region events
     protected virtual void Awake()
     {
-        if (nHp != null) HP = nHp.GetComponentsInChildren<Image>();
-        if (nMax != null) maxHP = nMax.GetComponentsInChildren<Image>();
+        
+        if (nHp != null) hp = nHp.GetComponentsInChildren<Image>();
+        if (nMax != null) hpM = nMax.GetComponentsInChildren<Image>();
 
         heart = GameObject.Find("Heart").GetComponent<UI.Heart>();
     }
 
     protected virtual void Start()
     {
-        hp_Temp = hp;
-        maxHp_Temp = maxHp;
+        hp_Temp = HP;
+        maxHp_Temp = MaxHP;
 
-        rElapse = 50f / recovery;
+        rElapse = 50f / Recover;
     }
 
     protected virtual void FixedUpdate()
     {
         Health();
-        if (hp > 0) Recovery();
+        if (HP > 0) Recovery();
     }
     #endregion
 
@@ -68,14 +66,12 @@ public class StatGeneral : MonoBehaviour
     /// </summary>
     protected void Health()
     {
-        hp = Mathf.Clamp(hp, 0, maxHp);
-
         hp_units = hp_Temp % 10;
         hp_tens = hp_Temp / 10 % 10;
         hp_hundreds = hp_Temp / 100;
 
-        int temp = Mathf.Abs(hp - hp_Temp);
-        if (hp > hp_Temp)
+        int temp = Mathf.Abs(HP - hp_Temp);
+        if (HP > hp_Temp)
         {
             if (temp > 256)
                 hp_Temp += 168;
@@ -86,7 +82,7 @@ public class StatGeneral : MonoBehaviour
             if (nHp != null)
                 HPdisplay();
         }
-        else if (hp < hp_Temp)
+        else if (HP < hp_Temp)
         {
             if (temp > 256)
                 hp_Temp -= 168;
@@ -95,22 +91,22 @@ public class StatGeneral : MonoBehaviour
             else
                 hp_Temp--;
         }
-        
 
+        data.hp = Mathf.Clamp(data.hp, 0, MaxHP);
 
         maxHp_units = maxHp_Temp % 10;
         maxHp_tens = maxHp_Temp / 10 % 10;
         maxHp_hundreds = maxHp_Temp / 100;
 
-        if (maxHp > maxHp_Temp)
+        if (MaxHP > maxHp_Temp)
             maxHp_Temp++;
-        else if (maxHp < maxHp_Temp)
+        else if (MaxHP < maxHp_Temp)
             maxHp_Temp--;
 
         if (nHp != null && nMax != null)
         {
-            HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, HP, nHp);
-            HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, maxHP, nMax);
+            HPdisplay(hp_Temp, hp_units, hp_tens, hp_hundreds, hp, nHp);
+            HPdisplay(maxHp_Temp, maxHp_units, maxHp_tens, maxHp_hundreds, hpM, nMax);
 
             HPdisplay();
         }
@@ -121,18 +117,18 @@ public class StatGeneral : MonoBehaviour
     /// </summary>
     private void HPdisplay()
     {
-        if (hp != hp_Temp || hp_Stat <= 1 || hp <= 3 && hp >= 1)
-            for (int i = 0; i < HP.Length; i++)
+        if (HP != hp_Temp || hp_Stat <= 1 || HP <= 3 && HP >= 1)
+            for (int i = 0; i < hp.Length; i++)
             {
-                HP[i].transform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-5.0f, 5.0f));
+                hp[i].transform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-5.0f, 5.0f));
             }
         else
-            for (int i = 0; i < HP.Length; i++)
+            for (int i = 0; i < hp.Length; i++)
             {
-                HP[i].transform.rotation = Quaternion.Euler(0, 0, 0);
+                hp[i].transform.rotation = Quaternion.Euler(0, 0, 0);
             }
 
-        float hp_percentage = (float)hp / (float)maxHp;
+        float hp_percentage = (float)HP / (float)MaxHP;
 
         if (hp_percentage == 0f)
             hp_Stat = 0;
@@ -194,70 +190,90 @@ public class StatGeneral : MonoBehaviour
     protected virtual void Recovery()
     {
         rElapse -= Time.deltaTime;
-        rElapse = Mathf.Clamp(rElapse, 0, 50f / recovery);
+        rElapse = Mathf.Clamp(rElapse, 0, 50f / Recover);
 
         if (rElapse == 0)
         {
-            hp += (int)Mathf.Ceil(maxHp * 0.01f * (INT / 10));
-            rElapse = 50f / recovery;
+            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
+            if (data.hp < MaxHP)
+            {
+                StartCoroutine(RecoverDisplayer(heal.ToString(), gameObject.transform));
+            }
+            data.hp += heal;
+            rElapse = 50f / Recover;
         }
     }
 
-    public IEnumerator Damage(int dmg, Transform trans, Elements e)
+    public IEnumerator DamageDisplayer(string dmg, Transform trans, Elements e, bool isCrit)
     {
-        hp -= dmg;
+        if (dmg.IsNumeric())
+        {
+            data.hp -= int.Parse(dmg);
+        }
+        
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
+        Vector2 force = new Vector2(Random.Range(-1f, 1f), 2.5f) * 100f;
+
+        if (isCrit)
+            StartCoroutine(CritDisplayer(trans, force));
 
         GameObject Damage = new GameObject("Damage");
         Damage.transform.position = (Vector2)trans.position + Vector2.up;
-        
+
         TextMesh damage = Damage.AddComponent<TextMesh>();
-        damage.text = dmg.ToString();
+        damage.text = dmg;
         damage.characterSize = 0.25f;
         damage.font = Resources.Load("04B_03__") as Font; 
         damage.GetComponent<MeshRenderer>().material = Resources.Load("04B_03__") as Material;
         damage.fontSize = 16;
 
         Color color = Color.white;
-
-        switch (e)
+        if (dmg.IsNumeric())
         {
-            case Elements.Brave:
-                color = Color.red;
-                break;
-            case Elements.Agile:
-                color = Color.green;
-                break;
-            case Elements.Guard:
-                color = Color.blue;
-                color.g = 0.5f;
-                break;
-            case Elements.Origin:
-                color = Color.yellow;
-                break;
-            case Elements.Earth:
-                color.g = 0;
-                break;
-            case Elements.Chaos:
-                color.r = 0.8f;
-                color.g = 0.8f;
-                color.b = 0.8f;
-                break;
-            case Elements.Iridescent:
-                color = Color.cyan;
-                break;
-            case Elements.Dark:
-                color = Color.gray;
-                break;
+            switch (e)
+            {
+                case Elements.Brave:
+                    color = Color.red;
+                    break;
+                case Elements.Agile:
+                    color = Color.green;
+                    break;
+                case Elements.Guard:
+                    color = Color.blue;
+                    color.g = 0.5f;
+                    break;
+                case Elements.Origin:
+                    color = Color.yellow;
+                    break;
+                case Elements.Earth:
+                    color.g = 0;
+                    break;
+                case Elements.Chaos:
+                    color.r = 0.8f;
+                    color.g = 0.8f;
+                    color.b = 0.8f;
+                    break;
+                case Elements.Iridescent:
+                    color = Color.cyan;
+                    break;
+                case Elements.Dark:
+                    color = Color.gray;
+                    break;
+            }
+        }
+        else
+        {
+            color.r = 0.64f;
+            color.g = 0f;
         }
         damage.color = color;
 
         Renderer renderer = damage.GetComponent<Renderer>();
         renderer.sortingOrder = 20;
-        
-        Rigidbody2D body = Damage.AddComponent<Rigidbody2D>();
-        body.AddForce(new Vector2(Random.Range(-1f, 1f), 2.5f) * 100f);
 
-        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
+        Rigidbody2D body = Damage.AddComponent<Rigidbody2D>();
+        body.AddForce(force);
+
         Destroy(Damage, 1.5f);
         yield return wait;
 
@@ -271,6 +287,107 @@ public class StatGeneral : MonoBehaviour
         }
     }
 
+    public IEnumerator RecoverDisplayer(string value, Transform trans)
+    {
+        if (value.IsNumeric())
+        {
+            data.hp -= int.Parse(value);
+        }
+
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
+        Vector2 force = new Vector2(Random.Range(-1f, 1f), 2.5f) * 100f;
+
+        GameObject Heal = new GameObject("Recover");
+        Heal.transform.position = (Vector2)trans.position + Vector2.up;
+
+        TextMesh heal = Heal.AddComponent<TextMesh>();
+        heal.text = value;
+        heal.characterSize = 0.25f;
+        heal.font = Resources.Load("04B_03__") as Font;
+        heal.GetComponent<MeshRenderer>().material = Resources.Load("04B_03__") as Material;
+        heal.fontSize = 16;
+
+        heal.color = new Color(0, 0.6f, 0, 1);
+
+        Renderer renderer = heal.GetComponent<Renderer>();
+        renderer.sortingOrder = 20;
+
+        Rigidbody2D body = Heal.AddComponent<Rigidbody2D>();
+        body.isKinematic = true;
+        body.AddForce(force);
+
+        Destroy(Heal, 1.5f);
+        yield return wait;
+
+        wait.waitTime = 0.05f;
+        Color fade = new Color(heal.color.r, heal.color.g, heal.color.b, 1);
+        while (heal.color.a != 0)
+        {
+            fade.a -= 0.1f;
+            heal.color = fade;
+            yield return wait;
+        }
+    }
+
+    public IEnumerator CritDisplayer(Transform trans, Vector2 force)
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
+        GameObject Crit = new GameObject("Critical!");
+        Crit.transform.position = (Vector2)trans.position + Vector2.up;
+
+        TextMesh crit = Crit.AddComponent<TextMesh>();
+        crit.text = "critical!";
+        crit.characterSize = 0.25f;
+        crit.font = Resources.Load("04B_03__") as Font;
+        crit.GetComponent<MeshRenderer>().material = Resources.Load("04B_03__") as Material;
+        crit.fontSize = 12;
+        crit.color = new Color(1, 0.5f, 0, 1);
+
+        Renderer renderer = crit.GetComponent<Renderer>();
+        renderer.sortingOrder = 20;
+
+        Rigidbody2D body = Crit.AddComponent<Rigidbody2D>();
+        body.AddForce(force);
+
+        Destroy(Crit, 1.5f);
+        yield return wait;
+
+        wait.waitTime = 0.05f;
+        Color fade = new Color(crit.color.r, crit.color.g, crit.color.b, 1);
+        while (crit.color.a != 0)
+        {
+            fade.a -= 0.1f;
+            crit.color = fade;
+            crit.color = fade;
+            yield return wait;
+        }
+
+    }
+
+    public void TakeDamage(StatGeneral attacker, StatGeneral defender)
+    {
+        float dmg;
+        string damage;
+
+        dmg = (Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f) - Random.Range(defender.STR * 0.99f, defender.STR * 1.01f));
+        dmg = Mathf.Clamp(dmg, 0, dmg);
+        bool isCrit = attacker.LUK + Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
+        dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;
+        dmg = (Random.Range(0, defender.AGI) > Random.Range(0, attacker.AGI)) ? -1 : dmg;
+        
+        damage = (dmg < 0) ? "miss" : ((int)dmg).ToString();
+
+        if (damage == "miss")
+            isCrit = false;
+        else
+            defender.GetComponent<Animator>().SetTrigger("TakeHit");
+
+        if (dmg > attacker.STR) isCrit = false;
+
+        StartCoroutine(defender.DamageDisplayer(damage, transform, Elements.None, isCrit));
+    }
 
     public void ToggleChat()
     {

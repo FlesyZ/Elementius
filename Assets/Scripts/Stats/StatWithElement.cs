@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Game;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ public class StatWithElement : StatGeneral
     {
         Health();
         eSlot = elements;
-        if (hp > 0) Recovery();
+        if (HP > 0) Recovery();
     }
 
     protected override void FixedUpdate()
@@ -254,19 +255,22 @@ public class StatWithElement : StatGeneral
 
         if (e_Temp != elements)
         {
-            for (int i = 0; i < eStored.Count; i++)
+            for (int n = 0; n < 32; n++)
             {
-                for (int j = 0; j < 32; j++)
+                if (eStored.Count != 0)
                 {
-                    if (slots[j].ID == i)
+                    if (slots[n].ID == n && slots[n].ID < eStored.Count)
                     {
-                        slots[j].stored = eStored[i];
+                        slots[n].stored = eStored[n];
                     }
-                    else if (slots[j].ID >= elements)
+                    else if (slots[n].ID >= elements)
                     {
-                        slots[j].stored = 0;
+                        slots[n].stored = 0;
                     }
-
+                }
+                else if (slots[n].ID >= elements)
+                {
+                    slots[n].stored = 0;
                 }
             }
             e_Temp = elements;
@@ -349,15 +353,61 @@ public class StatWithElement : StatGeneral
     protected override void Recovery()
     {
         rElapse -= Time.deltaTime;
-        rElapse = Mathf.Clamp(rElapse, 0, 50f / recovery);
+        rElapse = Mathf.Clamp(rElapse, 0, 50f / Recover);
 
         if (rElapse == 0)
         {
-            hp += (int)Mathf.Ceil(maxHp * 0.01f * (INT / 10));
-            rElapse = 50f / recovery;
+            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
+            if (data.hp < MaxHP)
+            {
+                StartCoroutine(RecoverDisplayer(heal.ToString(), gameObject.transform));
+            }
+            data.hp += heal;
+            rElapse = 50f / Recover;
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
         }
     }
-    
+
+    public void TakeDamage(StatWithElement attacker, StatGeneral defender)
+    {
+        float dmg;
+        string damage;
+        
+        // [1] Brave >> Agile >> Guard >> Brave
+        // [2] Origin <> Earth
+        // [3] Dark >> Chaos >> (1)
+        // [4] Iridescent >> (2)
+
+        Elements a = attacker.eKeep;
+        Elements d = (defender.GetComponent<Enemy>()) ? defender.GetComponent<Enemy>().State : defender.GetComponent<StatWithElement>().eKeep;
+
+        short isStrongOrWeak = States.StrongOrWeakDetector(a, d);
+
+        float atk = UnityEngine.Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
+        float def = UnityEngine.Random.Range(defender.STR * 0.99f, defender.STR * 1.01f);
+
+        if (isStrongOrWeak > 0)
+            dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
+        else if (isStrongOrWeak < 0)
+            dmg = (atk + attacker.INT * 0.2f - def) - defender.INT * 0.5f;
+        else
+            dmg = (a == 0) ? (atk - def) : (atk + attacker.INT * 0.2f - def);
+
+        dmg = Mathf.Clamp(dmg, 0, dmg);
+        bool isCrit = attacker.LUK + UnityEngine.Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
+        dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;
+        dmg = (UnityEngine.Random.Range(0, defender.AGI) > UnityEngine.Random.Range(0, attacker.AGI)) ? -1 : dmg;
+
+        damage = (dmg < 0) ? "miss" : ((int)dmg).ToString();
+
+        if (damage == "miss")
+            isCrit = false;
+        else
+            defender.GetComponent<Animator>().SetTrigger("TakeHit");
+
+        if (dmg > attacker.STR) isCrit = false;
+        
+        StartCoroutine(defender.DamageDisplayer(damage, transform, a, isCrit));
+    }
 }

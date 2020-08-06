@@ -14446,6 +14446,31 @@ PrefabInstance:
       propertyPath: m_Name
       value: Skeleton
       objectReference: {fileID: 0}
+    - target: {fileID: 6787936318364347715, guid: 40c2475fd2f84e1488d4dc2eabf61276,
+        type: 3}
+      propertyPath: Health
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6787936318364347715, guid: 40c2475fd2f84e1488d4dc2eabf61276,
+        type: 3}
+      propertyPath: Strength
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6787936318364347715, guid: 40c2475fd2f84e1488d4dc2eabf61276,
+        type: 3}
+      propertyPath: Agility
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 6787936318364347715, guid: 40c2475fd2f84e1488d4dc2eabf61276,
+        type: 3}
+      propertyPath: Intelligence
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6787936318364347715, guid: 40c2475fd2f84e1488d4dc2eabf61276,
+        type: 3}
+      propertyPath: Luck
+      value: 25
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40c2475fd2f84e1488d4dc2eabf61276, type: 3}
 --- !u!1001 &3730157983577591926

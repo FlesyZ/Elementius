@@ -26,7 +26,7 @@ public class AttackRange : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             Enemy enemy = other.GetComponent<Enemy>();
-            enemy.Damage(player.stat.ATK - enemy.stat.DEF + Random.Range(-1, 3), player.stat.eKeep);
+            enemy.stat.TakeDamage(player.stat, enemy.stat);
         }
     }
 }

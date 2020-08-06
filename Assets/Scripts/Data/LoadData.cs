@@ -13,13 +13,13 @@ public class LoadData : MonoBehaviour
 
         foreach (var item in stats)
         {
-            item.maxHp = 20;
-            item.hp = item.maxHp;
-            item.ATK = 5;
-            item.DEF = 5;
-            item.INT = 3;
-            item.AGI = 5;
-            item.recovery = 7;
+            item.MaxHP = 50;
+            item.data.hp = item.MaxHP;
+            item.data.STR = 60;
+            item.data.INT = 40;
+            item.data.AGI = 50;
+            item.data.LUK = 45;
+            item.data.recovery = 7;
         }
 
         SceneManager.LoadScene("TestLevel");

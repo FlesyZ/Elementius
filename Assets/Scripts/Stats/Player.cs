@@ -60,7 +60,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        // detect 
+        // detecting action
         var action = InAction(Action, ActionTimer);
         Action = action.Item1;
         ActionTimer = action.Item2;
@@ -88,9 +88,9 @@ public class Player : MonoBehaviour
             r.velocity = new Vector2(Mathf.Clamp(X * Speed, Dash, Dash), r.velocity.y);
         else if (X != 0)
             r.velocity = Vector2.Lerp(r.velocity, new Vector2(X * Speed, r.velocity.y), Time.deltaTime * 10f);
-        else if (x == 0)
-            r.velocity = new Vector2(0f, r.velocity.y);
         else if (Action.Contains("Attack") || Action.Contains("Damage"))
+            r.velocity = new Vector2(0f, r.velocity.y);
+        else if (x == 0)
             r.velocity = new Vector2(0f, r.velocity.y);
 
         float move;
@@ -112,7 +112,7 @@ public class Player : MonoBehaviour
             r.velocity = new Vector2(r.velocity.x, Jump * Speed);
             ground.Disable(0.0f);
         }
-        else if (Input.GetKeyDown(KeyCode.Mouse0) && isGrounded && !Action.Contains("Attack"))
+        else if (Input.GetKeyDown(KeyCode.Mouse0) && isGrounded && x == 0 && !Action.Contains("Attack"))
         {
             a.SetTrigger("Attack");
             Action.Add("Attack");
@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
     {
         if (play)
             Move();
-        else if (stat.hp == 0)
+        else if (stat.HP == 0)
             Death();
     }
     #endregion

@@ -33,6 +33,10 @@ public class GameManager : MonoBehaviour
 
         gameover.canvasRenderer.SetAlpha(1f);
         gameover.GetComponent<CanvasGroup>().alpha = 0;
+
+        UI.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceCamera;
+        UI.GetComponent<Canvas>().worldCamera = Camera.main;
+        UI.GetComponent<Canvas>().sortingOrder = 100;
     }
 
     private IEnumerator FadeOut()
@@ -69,7 +73,7 @@ public class GameManager : MonoBehaviour
 
         int alive = 0;
         foreach (var item in player)
-            if (item.stat.hp > 0)
+            if (item.stat.HP > 0)
                 alive++;
         if (alive == 0 && playOne != 0)
         {
