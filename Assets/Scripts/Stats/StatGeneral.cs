@@ -22,9 +22,11 @@ public class StatGeneral : MonoBehaviour
     public bool isShown;
 
     public float Recover { get { return data.recovery; } }
-
+    public bool Resting { protected get; set; }
 
     public float rElapse { get; protected set; }
+
+    public bool Guarding { get; set; }
 
     public int STR { get { return Mathf.Clamp(data.STR, 0, data.STR); } }
     public int AGI { get { return Mathf.Clamp(data.AGI, 0, data.AGI); } }
@@ -187,19 +189,25 @@ public class StatGeneral : MonoBehaviour
     }
     #endregion
 
-    protected virtual void Recovery()
+    protected void Recovery()
     {
-        rElapse -= Time.deltaTime;
+        if (Resting)
+            rElapse -= Time.deltaTime;
+        else
+            rElapse = Mathf.Infinity;
+
         rElapse = Mathf.Clamp(rElapse, 0, 50f / Recover);
 
         if (rElapse == 0)
         {
             int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
-            if (data.hp < MaxHP)
+            if (HP < MaxHP)
             {
-                StartCoroutine(RecoverDisplayer(heal.ToString(), gameObject.transform));
+                if (HP + heal > MaxHP) heal = MaxHP - HP;
+                data.hp += heal;
+                StartCoroutine(RecoverDisplayer("" + heal, gameObject.transform));
             }
-            data.hp += heal;
+
             rElapse = 50f / Recover;
         }
     }
@@ -289,11 +297,6 @@ public class StatGeneral : MonoBehaviour
 
     public IEnumerator RecoverDisplayer(string value, Transform trans)
     {
-        if (value.IsNumeric())
-        {
-            data.hp -= int.Parse(value);
-        }
-
         WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.5f);
         Vector2 force = new Vector2(Random.Range(-1f, 1f), 2.5f) * 100f;
 
@@ -371,7 +374,10 @@ public class StatGeneral : MonoBehaviour
         float dmg;
         string damage;
 
-        dmg = (Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f) - Random.Range(defender.STR * 0.99f, defender.STR * 1.01f));
+        float atk = Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
+        float def = (defender.Guarding) ? Random.Range(defender.STR * 0.99f, defender.STR * 1.01f) : Random.Range(defender.STR * 1.5f, defender.STR * 2f);
+
+        dmg = atk - def;
         dmg = Mathf.Clamp(dmg, 0, dmg);
         bool isCrit = attacker.LUK + Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
         dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;

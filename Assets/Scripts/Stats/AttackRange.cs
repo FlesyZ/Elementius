@@ -23,7 +23,7 @@ public class AttackRange : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy") && GetComponentInParent<Player>())
         {
             Enemy enemy = other.GetComponent<Enemy>();
             enemy.stat.TakeDamage(player.stat, enemy.stat);

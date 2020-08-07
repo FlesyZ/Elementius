@@ -36,10 +36,14 @@ public class Enemy : MonoBehaviour
     Vector2 Movement { get { return new Vector2(moveX, moveY); } }
     Vector3 point = new Vector2(1, -1f);
     RaycastHit2D onGround;
-    public bool isMoving { get { return !anim.GetBool("IsTakingDamage"); } }
-    bool dead;
 
     public float Move { get { return anim.GetFloat("Move"); } }
+    public bool isMoving { get { return !anim.GetBool("IsTakingDamage"); } }
+
+    public float defendTime;
+
+    bool dead;
+
 
     void Awake()
     {
@@ -115,6 +119,27 @@ public class Enemy : MonoBehaviour
         }
         Destroy(gameObject, 1f);
         dead = true;
+    }
+
+    public void Attack()
+    {
+
+    }
+
+    public void Defend()
+    {
+        StartCoroutine(Defending(defendTime));
+    }
+
+    IEnumerator Defending(float value)
+    {
+        WaitForSecondsRealtime defend = new WaitForSecondsRealtime(0)
+        {
+            waitTime = value
+        };
+
+        yield return defend;
+
     }
 
     public void StopMoving()

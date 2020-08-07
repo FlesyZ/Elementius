@@ -15,12 +15,14 @@ public class Ground : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        inCollider++;
+        if (other.collider.CompareTag("Player"))
+            inCollider++;
     }
 
     private void OnCollisionExit2D(Collision2D other)
     {
-        inCollider--;
+        if (other.collider.CompareTag("Player"))
+            inCollider--;
     }
 
     public void Disable(float time)

@@ -350,22 +350,29 @@ public class StatWithElement : StatGeneral
     }
     #endregion
 
-    protected override void Recovery()
+    protected new void Recovery()
     {
-        rElapse -= Time.deltaTime;
+        if (Resting)
+            rElapse -= Time.deltaTime;
+        else
+            rElapse = Mathf.Infinity;
+
         rElapse = Mathf.Clamp(rElapse, 0, 50f / Recover);
 
         if (rElapse == 0)
         {
             int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
-            if (data.hp < MaxHP)
+            if (HP < MaxHP)
             {
-                StartCoroutine(RecoverDisplayer(heal.ToString(), gameObject.transform));
+                if (HP + heal > MaxHP) heal = MaxHP - HP;
+                data.hp += heal;
+                StartCoroutine(RecoverDisplayer("" + heal, gameObject.transform));
             }
-            data.hp += heal;
-            rElapse = 50f / Recover;
+
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
+
+            rElapse = 50f / Recover;
         }
     }
 
@@ -385,7 +392,7 @@ public class StatWithElement : StatGeneral
         short isStrongOrWeak = States.StrongOrWeakDetector(a, d);
 
         float atk = UnityEngine.Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
-        float def = UnityEngine.Random.Range(defender.STR * 0.99f, defender.STR * 1.01f);
+        float def = (defender.Guarding) ? UnityEngine.Random.Range(defender.STR * 0.99f, defender.STR * 1.01f): UnityEngine.Random.Range(defender.STR * 1.5f, defender.STR * 2f);
 
         if (isStrongOrWeak > 0)
             dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
