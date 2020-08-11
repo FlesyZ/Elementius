@@ -34,16 +34,20 @@ public class Enemy : MonoBehaviour
 
     float moveX = 1, moveY = 0;
     Vector2 Movement { get { return new Vector2(moveX, moveY); } }
-    Vector3 point = new Vector2(1, -1f);
-    RaycastHit2D onGround;
+    RaycastHit2D onGround { get { return Physics2D.Raycast(transform.position + transform.right, transform.up * -1f, 1, 1 << 9); } }
+
+    Player[] players;
+    List<RaycastHit2D> RayToPlayers = new List<RaycastHit2D>();
 
     public float Move { get { return anim.GetFloat("Move"); } }
-    public bool isMoving { get { return !anim.GetBool("IsTakingDamage"); } }
+    public bool isMoving { get { return !(anim.GetBool("IsTakingDamage") || anim.GetBool("IsAttacking")); } }
 
+    AttackRange attack;
+    public int AttackOrder { get; private set; } = 0;
+    
     public float defendTime;
 
     bool dead;
-
 
     void Awake()
     {
@@ -61,34 +65,52 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        Collider2D player = FindObjectOfType<Player>().GetComponent<Collider2D>();
+        players = FindObjectsOfType<Player>();
 
+        Collider2D player = FindObjectOfType<Player>().GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(player, transform.GetComponent<Collider2D>());
+
+        attack = GetComponentInChildren<AttackRange>();
     }
 
     void Update()
     {
-        onGround = Physics2D.Raycast(transform.position, point, 1, 1 << 9);
-
         // auto rotation
-        if (onGround.collider)
+        if (!onGround.collider)
         {
             if (transform.rotation.y != 0)
                 transform.rotation = Quaternion.Euler(0, 0, 0);
             else if (transform.rotation.y != 180)
                 transform.rotation = Quaternion.Euler(0, 180, 0);
 
-            point = new Vector2(point.x * -1f, point.y);
             moveX *= -1f;
         }
 
         if (isMoving)
+        {
             body.velocity = Movement;
+            body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
         else
-            body.velocity = Vector2.zero;
+            body.constraints = RigidbodyConstraints2D.FreezeAll;
 
         anim.SetFloat("Move", body.velocity.x);
-        
+
+        DetectPlayers();
+
+        foreach (var item in RayToPlayers)
+        {
+            if (item.distance < 1.2f && !anim.GetBool("IsAttacking"))
+            {
+                anim.SetBool("IsAttacking", true);
+                StartCoroutine(DoAttack());
+            }
+            else if (item.distance >= 1.2f)
+            {
+                anim.SetBool("IsAttacking", false);
+            }
+        }
+
         if (Move > 0)
             anim.SetInteger("Moving", 1);
         else if (Move < 0)
@@ -98,6 +120,17 @@ public class Enemy : MonoBehaviour
 
         if (stat.HP <= 0 && !dead)
             Death();
+    }
+
+    void DetectPlayers()
+    {
+        if (RayToPlayers.Count > 0) RayToPlayers.Clear();
+
+        if (players.Length > 0)
+        {
+            foreach (var item in players)
+                RayToPlayers.Add(Physics2D.Linecast(transform.position, item.transform.position, 1 << 10));
+        }
     }
 
     void Death()
@@ -121,9 +154,22 @@ public class Enemy : MonoBehaviour
         dead = true;
     }
 
+    IEnumerator DoAttack()
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.7f);
+        while (anim.GetBool("IsAttacking"))
+        {
+            anim.SetInteger("Attack_const", AttackOrder);
+            anim.SetTrigger("Attack");
+            AttackOrder++;
+            AttackOrder %= 2;
+            yield return wait;
+        }
+    }
+
     public void Attack()
     {
-
+        attack.enabled = true;
     }
 
     public void Defend()
@@ -156,6 +202,8 @@ public class Enemy : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, point);
+        Gizmos.DrawRay(transform.position + transform.right, transform.up * -1f);
+        foreach (var item in players)
+            Gizmos.DrawLine(transform.position, item.transform.position);
     }
 }

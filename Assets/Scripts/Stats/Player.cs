@@ -14,12 +14,19 @@ public class Player : MonoBehaviour
     private Animator a;
     public Animator anim { get { return a; } set { a = value; } }
 
-    public Collider2D attack { get; set; }
+    AttackRange attack;
 
     private Rigidbody2D r;
     
-    private Ground ground;
     private bool isGrounded = false;
+    protected RaycastHit2D grounded
+    {
+        get
+        {
+            return Physics2D.Raycast(transform.position, Vector2.down, 0.5f, 1 << 9);
+        }
+    }
+
 
     private List<string> Action = new List<string>();
     private List<float> ActionTimer = new List<float>();
@@ -34,12 +41,11 @@ public class Player : MonoBehaviour
     private void Start()
     {
         stat = FindObjectOfType<StatWithElement>();
-        ground = FindObjectOfType<Ground>();
 
         a = GetComponent<Animator>();
         r = GetComponent<Rigidbody2D>();
 
-        attack = GetComponentInChildren<AttackRange>().GetComponent<Collider2D>();
+        attack = GetComponentInChildren<AttackRange>();
 
         particle = FindObjectOfType<ParticleSystem>();
         particle.gameObject.SetActive(false);
@@ -60,11 +66,9 @@ public class Player : MonoBehaviour
         {
             particle.gameObject.SetActive(false);
         }
-        else if (stat.eKeep != Elements.None && particle.gameObject.activeSelf == true)
+
+        if (stat.eKeep != Elements.None && particle.gameObject.activeSelf == true)
         {
-            Debug.Log("ouo");
-            var main = particle.main;
-            var color = main.startColor;
             Color colour = Color.white;
             switch (stat.eKeep)
             {
@@ -98,7 +102,8 @@ public class Player : MonoBehaviour
                     colour.b = UnityEngine.Random.Range(0f, 0.1f);
                     break;
             }
-            color.color = colour;
+            var main = particle.main;
+            main.startColor = colour;
         }
     }
     #endregion
@@ -143,21 +148,25 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        // detecting action
+        // 偵測動作狀態
         var action = InAction(Action, ActionTimer);
         Action = action.Item1;
         ActionTimer = action.Item2;
 
-        if (!isGrounded && ground.State())
+        // 踩在地上的偵測
+        if (grounded.collider != null)
         {
-            isGrounded = true;
-            a.SetBool("Grounded", isGrounded);
-        }
+            if (!isGrounded && grounded.collider.gameObject.CompareTag("Floor"))
+            {
+                isGrounded = true;
+                a.SetBool("Grounded", isGrounded);
+            }
 
-        if (isGrounded && !ground.State())
-        {
-            isGrounded = false;
-            a.SetBool("Grounded", isGrounded);
+            if (isGrounded && !grounded.collider.gameObject.CompareTag("Floor"))
+            {
+                isGrounded = false;
+                a.SetBool("Grounded", isGrounded);
+            }
         }
 
         float X = Input.GetAxis("Horizontal");
@@ -174,7 +183,7 @@ public class Player : MonoBehaviour
             r.velocity = new Vector2(Mathf.Clamp(X * Speed, Dash, Dash), r.velocity.y);
         else if (X != 0)
             r.velocity = Vector2.Lerp(r.velocity, new Vector2(X * Speed, r.velocity.y), Time.deltaTime * 10f);
-        else if (Action.Contains("Attack") || Action.Contains("Damage"))
+        else if (Action.Contains("Attack") || Action.Contains("TakeHit"))
             r.velocity = new Vector2(0f, r.velocity.y);
         else if (x == 0)
             r.velocity = new Vector2(0f, r.velocity.y);
@@ -188,7 +197,7 @@ public class Player : MonoBehaviour
         else
             move = r.velocity.x;
 
-        if (!Action.Contains("Attack") && !Action.Contains("Damage"))
+        if (!Action.Contains("Attack") && !Action.Contains("TakeHit"))
             a.SetFloat("Move", move);
         
         a.SetFloat("Air", r.velocity.y);
@@ -202,7 +211,6 @@ public class Player : MonoBehaviour
             isGrounded = false;
             a.SetBool("Grounded", isGrounded);
             r.velocity = new Vector2(r.velocity.x, Jump * Speed);
-            ground.Disable(0.0f);
         }
         else if (Input.GetKeyDown(KeyCode.Mouse0) && isGrounded && x == 0 && !Action.Contains("Attack"))
         {
@@ -236,5 +244,11 @@ public class Player : MonoBehaviour
                 Absorbed = false;
             }
         }
+    }
+
+    public void TakeHit()
+    {
+        Action.Add("TakeHit");
+        ActionTimer.Add(0.5f);
     }
 }

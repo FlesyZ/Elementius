@@ -350,7 +350,7 @@ public class StatWithElement : StatGeneral
     }
     #endregion
 
-    protected new void Recovery()
+    protected override void Recovery()
     {
         if (Resting)
             rElapse -= Time.deltaTime;
@@ -371,50 +371,8 @@ public class StatWithElement : StatGeneral
 
             if (eStored.Count < eSlots)
                 eStored.Add((Elements)UnityEngine.Random.Range(1, 7));
-
+            
             rElapse = 50f / Recover;
         }
-    }
-
-    public void TakeDamage(StatWithElement attacker, StatGeneral defender)
-    {
-        float dmg;
-        string damage;
-        
-        // [1] Brave >> Agile >> Guard >> Brave
-        // [2] Origin <> Earth
-        // [3] Dark >> Chaos >> (1)
-        // [4] Iridescent >> (2)
-
-        Elements a = attacker.eKeep;
-        Elements d = (defender.GetComponent<Enemy>()) ? defender.GetComponent<Enemy>().State : defender.GetComponent<StatWithElement>().eKeep;
-
-        short isStrongOrWeak = States.StrongOrWeakDetector(a, d);
-
-        float atk = UnityEngine.Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
-        float def = (defender.Guarding) ? UnityEngine.Random.Range(defender.STR * 0.99f, defender.STR * 1.01f): UnityEngine.Random.Range(defender.STR * 1.5f, defender.STR * 2f);
-
-        if (isStrongOrWeak > 0)
-            dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
-        else if (isStrongOrWeak < 0)
-            dmg = (atk + attacker.INT * 0.2f - def) - defender.INT * 0.5f;
-        else
-            dmg = (a == 0) ? (atk - def) : (atk + attacker.INT * 0.2f - def);
-
-        dmg = Mathf.Clamp(dmg, 0, dmg);
-        bool isCrit = attacker.LUK + UnityEngine.Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
-        dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;
-        dmg = (UnityEngine.Random.Range(0, defender.AGI) > UnityEngine.Random.Range(0, attacker.AGI)) ? -1 : dmg;
-
-        damage = (dmg < 0) ? "miss" : ((int)dmg).ToString();
-
-        if (damage == "miss")
-            isCrit = false;
-        else
-            defender.GetComponent<Animator>().SetTrigger("TakeHit");
-
-        if (dmg > attacker.STR) isCrit = false;
-        
-        StartCoroutine(defender.DamageDisplayer(damage, transform, a, isCrit));
     }
 }

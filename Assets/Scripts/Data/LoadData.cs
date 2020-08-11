@@ -13,12 +13,12 @@ public class LoadData : MonoBehaviour
 
         foreach (var item in stats)
         {
-            item.MaxHP = 50;
+            item.MaxHP = 200;
             item.data.hp = item.MaxHP;
-            item.data.STR = 60;
-            item.data.INT = 40;
-            item.data.AGI = 50;
-            item.data.LUK = 45;
+            item.data.STR = 50;
+            item.data.INT = 30;
+            item.data.AGI = 25;
+            item.data.LUK = 50;
             item.data.recovery = 7;
         }
 

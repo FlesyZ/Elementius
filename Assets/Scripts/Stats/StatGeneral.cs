@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Game;
+using System.Collections;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ public class StatGeneral : MonoBehaviour
 
     private UI.Heart heart;
 
-    public Game.States data;
+    public Game.GameState data;
 
     public int HP { get { return Mathf.Clamp(data.hp, 0, MaxHP); } }
 
@@ -189,7 +190,7 @@ public class StatGeneral : MonoBehaviour
     }
     #endregion
 
-    protected void Recovery()
+    protected virtual void Recovery()
     {
         if (Resting)
             rElapse -= Time.deltaTime;
@@ -266,6 +267,8 @@ public class StatGeneral : MonoBehaviour
                     break;
                 case Elements.Dark:
                     color = Color.gray;
+                    break;
+                default:
                     break;
             }
         }
@@ -369,20 +372,85 @@ public class StatGeneral : MonoBehaviour
 
     }
 
-    public void TakeDamage(StatGeneral attacker, StatGeneral defender)
+    /// <summary>
+    /// 玩家受到傷害
+    /// </summary>
+    /// <param name="attacker">攻擊方</param>
+    /// <param name="defender">防禦方</param>
+    /// <param name="player">防禦對象</param>
+    public void TakeDamage(Enemy enemy, Player player)
     {
+        StatGeneral attacker = enemy.stat;
+        StatGeneral defender = player.stat;
+
         float dmg;
         string damage;
+
+        Elements a = enemy.State;
+        Elements d = player.stat.eKeep;
+
+        short isStrongOrWeak = GameState.StrongOrWeakDetector(a, d);
 
         float atk = Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
         float def = (defender.Guarding) ? Random.Range(defender.STR * 0.99f, defender.STR * 1.01f) : Random.Range(defender.STR * 1.5f, defender.STR * 2f);
 
-        dmg = atk - def;
+        if (isStrongOrWeak > 0)
+            dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
+        else if (isStrongOrWeak < 0)
+            dmg = (atk + attacker.INT * 0.2f - def) - defender.INT * 0.5f;
+        else
+            dmg = (a == 0) ? (atk - def) : (atk + attacker.INT * 0.2f - def);
+
         dmg = Mathf.Clamp(dmg, 0, dmg);
         bool isCrit = attacker.LUK + Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
         dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;
         dmg = (Random.Range(0, defender.AGI) > Random.Range(0, attacker.AGI)) ? -1 : dmg;
-        
+
+        damage = (dmg < 0) ? "miss" : ((int)dmg).ToString();
+
+        if (damage == "miss")
+            isCrit = false;
+        else
+            player.GetComponent<Animator>().SetTrigger("TakeHit");
+
+        if (dmg > attacker.STR) isCrit = false;
+
+        StartCoroutine(defender.DamageDisplayer(damage, transform, a, isCrit));
+    }
+
+    /// <summary>
+    /// 非玩家受到傷害
+    /// </summary>
+    /// <param name="attacker">攻擊方</param>
+    /// <param name="defender">防禦方</param>
+    public void TakeDamage(Player player, Enemy enemy)
+    {
+        StatGeneral attacker = player.stat;
+        StatGeneral defender = enemy.stat;
+
+        float dmg;
+        string damage;
+
+        Elements a = player.stat.eKeep;
+        Elements d = enemy.State;
+
+        short isStrongOrWeak = GameState.StrongOrWeakDetector(a, d);
+
+        float atk = Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
+        float def = (defender.Guarding) ? Random.Range(defender.STR * 0.99f, defender.STR * 1.01f) : Random.Range(defender.STR * 1.5f, defender.STR * 2f);
+
+        if (isStrongOrWeak > 0)
+            dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
+        else if (isStrongOrWeak < 0)
+            dmg = (atk + attacker.INT * 0.2f - def) - defender.INT * 0.5f;
+        else
+            dmg = (a == 0) ? (atk - def) : (atk + attacker.INT * 0.2f - def);
+
+        dmg = Mathf.Clamp(dmg, 0, dmg);
+        bool isCrit = attacker.LUK + Random.Range(attacker.LUK * -1f, attacker.LUK * 0.2f) > attacker.LUK;
+        dmg = (isCrit && dmg > attacker.STR) ? (dmg * 2f) : dmg;
+        dmg = (Random.Range(0, defender.AGI) > Random.Range(0, attacker.AGI)) ? -1 : dmg;
+
         damage = (dmg < 0) ? "miss" : ((int)dmg).ToString();
 
         if (damage == "miss")
@@ -392,7 +460,7 @@ public class StatGeneral : MonoBehaviour
 
         if (dmg > attacker.STR) isCrit = false;
 
-        StartCoroutine(defender.DamageDisplayer(damage, transform, Elements.None, isCrit));
+        StartCoroutine(defender.DamageDisplayer(damage, transform, a, isCrit));
     }
 
     public void ToggleChat()

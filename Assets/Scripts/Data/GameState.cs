@@ -5,7 +5,7 @@
 
 namespace Game
 {
-    public struct States
+    public struct GameState
     {
         public int ID;
 
