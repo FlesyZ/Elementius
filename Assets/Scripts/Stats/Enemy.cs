@@ -47,6 +47,7 @@ public class Enemy : MonoBehaviour
     
     public float defendTime;
 
+    byte toward = 0;
     bool dead;
 
     void Awake()
@@ -75,16 +76,10 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        // auto rotation
-        if (!onGround.collider)
-        {
-            if (transform.rotation.y != 0)
-                transform.rotation = Quaternion.Euler(0, 0, 0);
-            else if (transform.rotation.y != 180)
-                transform.rotation = Quaternion.Euler(0, 180, 0);
+        DetectPlayers();
 
-            moveX *= -1f;
-        }
+        // auto rotation
+        transform.rotation = Quaternion.Euler(0, Toward(), 0);
 
         if (isMoving)
         {
@@ -95,8 +90,6 @@ public class Enemy : MonoBehaviour
             body.constraints = RigidbodyConstraints2D.FreezeAll;
 
         anim.SetFloat("Move", body.velocity.x);
-
-        DetectPlayers();
 
         foreach (var item in RayToPlayers)
         {
@@ -120,6 +113,31 @@ public class Enemy : MonoBehaviour
 
         if (stat.HP <= 0 && !dead)
             Death();
+    }
+
+    float Toward()
+    {   
+        byte t = toward;
+
+        if (!onGround.collider) t = (byte)(t++ % 2);
+
+        float? DistanceDetect = null;
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (DistanceDetect < RayToPlayers[i].distance || DistanceDetect == null)
+            {
+                t = (byte)((transform.position.x - players[i].transform.position.x > 0) ? 1 : 0);
+                DistanceDetect = RayToPlayers[i].distance;
+            }
+        }
+
+        if (toward != t)
+        {
+            moveX *= -1f;
+            toward = t;
+        }
+
+        return toward * 180f;
     }
 
     void DetectPlayers()
