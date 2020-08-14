@@ -361,7 +361,7 @@ public class StatWithElement : StatGeneral
 
         if (rElapse == 0)
         {
-            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
+            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * Mathf.Floor(INT / 10));
             if (HP < MaxHP)
             {
                 if (HP + heal > MaxHP) heal = MaxHP - HP;

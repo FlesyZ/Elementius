@@ -1,4 +1,7 @@
-﻿public enum Elements
+﻿using UnityEngine;
+using UI;
+
+public enum Elements
 {
     None, Brave, Agile, Guard, Origin, Earth, Chaos, Iridescent, Dark = 9
 }
@@ -140,7 +143,49 @@ namespace Game
             }
             return result;
         }
-    }
 
-    
+        public static float ValueWithElements(Elements e, StatGeneral stat, bool isAttack)
+        {
+            float value = stat.STR;
+
+            if (e == Elements.Brave || e == Elements.Agile || e == Elements.Guard)
+            {
+                value = 0.1f * (value * stat.STR);
+                switch ((int)e)
+                {
+                    case 1:
+                        value *= (isAttack) ? 2f : 0.8f;
+                        break;
+                    case 2:
+                        value *= (isAttack) ? 1.5f : 1.5f;
+                        break;
+                    case 3:
+                        value *= (isAttack) ? 0.8f : 2f;
+                        break;
+                }
+            }
+            else if (e == Elements.Origin)
+            {
+                value = 0.1f * (value * stat.INT);
+            }
+            else if (e == Elements.Earth)
+            {
+                value = 0.1f * (value * stat.AGI);
+            }
+            else if (e == Elements.Chaos)
+            {
+                value = 0.1f * (value * stat.LUK);
+            }
+            else if (e == Elements.Iridescent || e == Elements.Dark)
+            {
+                value = 0.5f * (stat.STR * stat.INT);
+                if (e == Elements.Iridescent)
+                    value *= (isAttack) ? 1f : 2f;
+                else
+                    value *= (isAttack) ? 2f : 1f;
+            }
+
+            return Random.Range(value * 0.9f, value * 1.1f);
+        }
+    }
 }

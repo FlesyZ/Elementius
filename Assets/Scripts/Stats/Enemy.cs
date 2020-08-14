@@ -119,15 +119,20 @@ public class Enemy : MonoBehaviour
     {   
         byte t = toward;
 
-        if (!onGround.collider) t = (byte)(t++ % 2);
-
-        float? DistanceDetect = null;
-        for (int i = 0; i < players.Length; i++)
+        if (!onGround.collider)
         {
-            if (DistanceDetect < RayToPlayers[i].distance || DistanceDetect == null)
+            t = (byte)(++t % 2);
+        }
+        else
+        {
+            float? DistanceDetect = null;
+            for (int i = 0; i < players.Length; i++)
             {
-                t = (byte)((transform.position.x - players[i].transform.position.x > 0) ? 1 : 0);
-                DistanceDetect = RayToPlayers[i].distance;
+                if (anim.GetBool("IsAttacking") && (DistanceDetect < RayToPlayers[i].distance || DistanceDetect == null))
+                {
+                    t = (byte)((transform.position.x - players[i].transform.position.x > 0) ? 1 : 0);
+                    DistanceDetect = RayToPlayers[i].distance;
+                }
             }
         }
 

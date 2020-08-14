@@ -201,7 +201,7 @@ public class StatGeneral : MonoBehaviour
 
         if (rElapse == 0)
         {
-            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * (INT / 10));
+            int heal = (int)Mathf.Ceil(MaxHP * 0.01f * Mathf.Ceil(INT / 10));
             if (HP < MaxHP)
             {
                 if (HP + heal > MaxHP) heal = MaxHP - HP;
@@ -391,8 +391,8 @@ public class StatGeneral : MonoBehaviour
 
         short isStrongOrWeak = GameState.StrongOrWeakDetector(a, d);
 
-        float atk = Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
-        float def = (defender.Guarding) ? Random.Range(defender.STR * 0.99f, defender.STR * 1.01f) : Random.Range(defender.STR * 1.5f, defender.STR * 2f);
+        float atk = GameState.ValueWithElements(a, attacker, true);
+        float def = GameState.ValueWithElements(a, defender, !Guarding);
 
         if (isStrongOrWeak > 0)
             dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
@@ -436,8 +436,8 @@ public class StatGeneral : MonoBehaviour
 
         short isStrongOrWeak = GameState.StrongOrWeakDetector(a, d);
 
-        float atk = Random.Range(attacker.STR * 0.99f, attacker.STR * 1.01f);
-        float def = (defender.Guarding) ? Random.Range(defender.STR * 0.99f, defender.STR * 1.01f) : Random.Range(defender.STR * 1.5f, defender.STR * 2f);
+        float atk = GameState.ValueWithElements(a, attacker, true);
+        float def = GameState.ValueWithElements(a, defender, !Guarding);
 
         if (isStrongOrWeak > 0)
             dmg = (atk + attacker.INT * 0.2f - def) + attacker.INT * 0.5f;
