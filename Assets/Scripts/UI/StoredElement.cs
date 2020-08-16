@@ -4,6 +4,7 @@ namespace UI
 {
     public class StoredElement : MonoBehaviour
     {
-        public Elements E;
+        [SerializeField]
+        Elements E;
     }
 }

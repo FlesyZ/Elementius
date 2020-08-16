@@ -40,7 +40,8 @@ public class Enemy : MonoBehaviour
     List<RaycastHit2D> RayToPlayers = new List<RaycastHit2D>();
 
     public float Move { get { return anim.GetFloat("Move"); } }
-    public bool isMoving { get { return !(anim.GetBool("IsTakingDamage") || anim.GetBool("IsAttacking")); } }
+    public bool isMoving { get { return !(anim.GetBool("IsTakingDamage") || anim.GetBool("IsAttacking") || getFreezed); } }
+    public bool getFreezed;
 
     AttackRange attack;
     public int AttackOrder { get; private set; } = 0;

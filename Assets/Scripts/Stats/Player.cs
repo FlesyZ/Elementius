@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public StatWithElement stat;
+    UI.GameMenu menu;
 
     public bool play = false;
 
@@ -17,7 +18,8 @@ public class Player : MonoBehaviour
     AttackRange attack;
 
     private Rigidbody2D r;
-    
+
+
     private bool isGrounded = false;
     protected RaycastHit2D grounded
     {
@@ -49,11 +51,13 @@ public class Player : MonoBehaviour
 
         particle = FindObjectOfType<ParticleSystem>();
         particle.gameObject.SetActive(false);
+
+        menu = FindObjectOfType<UI.GameMenu>();
     }
 
     private void Update()
     {
-        if (play)
+        if (play && !menu.menu)
             Move();
         else if (stat.HP == 0)
             Death();
@@ -104,6 +108,11 @@ public class Player : MonoBehaviour
             }
             var main = particle.main;
             main.startColor = colour;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) && !menu.menu)
+        {
+            menu.menu = true;
         }
     }
     #endregion
@@ -169,8 +178,10 @@ public class Player : MonoBehaviour
             }
         }
 
-        float X = Input.GetAxis("Horizontal");
-        float x = Input.GetAxisRaw("Horizontal");
+        float X, x;
+
+        X = Input.GetAxis("Horizontal");
+        x = Input.GetAxisRaw("Horizontal");
 
         // 轉向
         if (X > 0)
@@ -204,7 +215,7 @@ public class Player : MonoBehaviour
 
         stat.Resting = X == 0;
 
-        // 按鍵處理
+        // 按鍵處理 - 角色動作
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             a.SetTrigger("Jump");
