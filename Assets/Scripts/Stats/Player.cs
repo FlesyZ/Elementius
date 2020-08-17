@@ -109,11 +109,6 @@ public class Player : MonoBehaviour
             var main = particle.main;
             main.startColor = colour;
         }
-
-        if (Input.GetKeyDown(KeyCode.Escape) && !menu.menu)
-        {
-            menu.menu = true;
-        }
     }
     #endregion
 

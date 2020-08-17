@@ -12,7 +12,12 @@ namespace UI
 
         Animator button;
         Text text;
+
+        public List<Text> child { get; set; } = new List<Text>();
+
         public int order;
+
+        public bool unlocked { get; set; }
 
         void Awake()
         {
@@ -20,11 +25,21 @@ namespace UI
 
             button = GetComponent<Animator>();
             text = GetComponent<Text>();
+
+            if (transform.childCount != 0)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    child.Add(transform.GetChild(i).GetComponent<Text>());
+                    child[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         void Update()
         {
-            if (menu && !GetComponent<Button>().interactable && menu.ButtonIndex == null) Obfuscated();
+            if (menu && !unlocked) Obfuscated();
+
         }
 
         void Obfuscated()
