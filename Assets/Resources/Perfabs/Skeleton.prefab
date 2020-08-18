@@ -112,6 +112,10 @@ EdgeCollider2D:
   - {x: 0.9012995, y: 0.81371444}
   - {x: 0.48365068, y: 1.0005286}
   - {x: -0.118729115, y: 1.0846004}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!114 &1558509380749296320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +180,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -281,8 +286,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stat: {fileID: 5049530010653668177}
-  Health: 30
-  State: 1
+  Health: 10
+  State: 0
   Strength: 5
   Agility: 5
   Intelligence: 5
@@ -291,6 +296,7 @@ MonoBehaviour:
   XP: 0
   itemGet: []
   getChance: 0.5
+  getFreezed: 0
   defendTime: 0
 --- !u!114 &5049530010653668177
 MonoBehaviour:
@@ -375,6 +381,10 @@ EdgeCollider2D:
   - {x: 0.57069206, y: -0.016607702}
   - {x: 0.19964552, y: -0.22193432}
   - {x: -0.13768959, y: -0.27988452}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!114 &1558509380749296319
 MonoBehaviour:
   m_ObjectHideFlags: 0

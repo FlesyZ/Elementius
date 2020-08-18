@@ -411,7 +411,7 @@ public class StatGeneral : MonoBehaviour
         if (damage == "miss")
             isCrit = false;
         else
-            player.GetComponent<Animator>().SetTrigger("TakeHit");
+            player.TakeHit();
 
         if (dmg > attacker.STR) isCrit = false;
 
@@ -456,7 +456,7 @@ public class StatGeneral : MonoBehaviour
         if (damage == "miss")
             isCrit = false;
         else
-            defender.GetComponent<Animator>().SetTrigger("TakeHit");
+            enemy.TakeHit();
 
         if (dmg > attacker.STR) isCrit = false;
 

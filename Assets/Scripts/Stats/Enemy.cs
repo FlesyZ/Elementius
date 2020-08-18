@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
     public Animator anim { get; set; }
     public Rigidbody2D body { get; private set; }
 
+    AudioSource bone, swing;
+
     [Header("能力值")]
     [Tooltip("基礎生命值"), Range(0, 9999)]
     public int Health = 50;
@@ -63,6 +65,12 @@ public class Enemy : MonoBehaviour
         stat.data.INT = Intelligence;
         stat.data.LUK = Luck;
         stat.data.recovery = Recovery;
+
+        bone = gameObject.AddComponent<AudioSource>();
+        swing = gameObject.AddComponent<AudioSource>();
+
+        bone.clip = Resources.Load<AudioClip>("Sounds/Bones");
+        swing.clip = Resources.Load<AudioClip>("Sounds/Sword_Swing");
     }
 
     void Start()
@@ -70,7 +78,12 @@ public class Enemy : MonoBehaviour
         players = FindObjectsOfType<Player>();
 
         Collider2D player = FindObjectOfType<Player>().GetComponent<Collider2D>();
-        Physics2D.IgnoreCollision(player, transform.GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(player, GetComponent<Collider2D>());
+
+        Enemy[] enemies = FindObjectsOfType<Enemy>();
+
+        foreach (var item in enemies)
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), item.GetComponent<Collider2D>());
 
         attack = GetComponentInChildren<AttackRange>();
     }
@@ -193,12 +206,19 @@ public class Enemy : MonoBehaviour
 
     public void Attack()
     {
+        swing.PlayDelayed(0.2f);
         attack.enabled = true;
     }
 
     public void Defend()
     {
         StartCoroutine(Defending(defendTime));
+    }
+
+    public void TakeHit()
+    {
+        anim.SetTrigger("TakeHit");
+        bone.Play();
     }
 
     IEnumerator Defending(float value)

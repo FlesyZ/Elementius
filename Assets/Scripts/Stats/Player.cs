@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
 
     public bool play = false;
 
+    Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+    public AudioSource[] SoundStoring;
+
     private float Speed = 3.0f;
     private float Jump = 2.5f;
 
@@ -28,7 +31,6 @@ public class Player : MonoBehaviour
             return Physics2D.Raycast(transform.position, Vector2.down, 0.5f, 1 << 9);
         }
     }
-
 
     private List<string> Action = new List<string>();
     private List<float> ActionTimer = new List<float>();
@@ -53,6 +55,12 @@ public class Player : MonoBehaviour
         particle.gameObject.SetActive(false);
 
         menu = FindObjectOfType<UI.GameMenu>();
+
+        AudioClips.Add("jump", Resources.Load<AudioClip>("Sounds/Jump"));
+        AudioClips.Add("attack", Resources.Load<AudioClip>("Sounds/Sword_Swing"));
+        AudioClips.Add("taken", Resources.Load<AudioClip>("Sounds/Take_Hit"));
+        AudioClips.Add("dash", Resources.Load<AudioClip>("Sounds/Sword_Swing"));
+        AudioClips.Add("absorb", Resources.Load<AudioClip>("Sounds/Powerups"));
     }
 
     private void Update()
@@ -142,6 +150,94 @@ public class Player : MonoBehaviour
         attack.enabled = true;
     }
 
+    #region 播放音效
+    void PlaySound(AudioClip aud)
+    {
+        bool played = false;
+        for (int i = 0; i < SoundStoring.Length; i++)
+        {
+            if (!SoundStoring[i].isPlaying)
+            {
+                SoundStoring[i].clip = aud;
+                SoundStoring[i].Play();
+                played = true;
+                break;
+            }
+        }
+        if (!played)
+        {
+            SoundStoring[0].clip = aud;
+            SoundStoring[0].Play();
+        }
+    }
+
+    void PlaySound(AudioClip aud, float t)
+    {
+        bool played = false;
+        for (int i = 0; i < SoundStoring.Length; i++)
+        {
+            if (!SoundStoring[i].isPlaying)
+            {
+                SoundStoring[i].clip = aud;
+                SoundStoring[i].PlayDelayed(t);
+                played = true;
+                break;
+            }
+        }
+        if (!played)
+        {
+            SoundStoring[0].clip = aud;
+            SoundStoring[0].Play();
+        }
+    }
+
+    void PlaySound(AudioClip aud, float t, float volume)
+    {
+        bool played = false;
+        for (int i = 0; i < SoundStoring.Length; i++)
+        {
+            if (!SoundStoring[i].isPlaying)
+            {
+                SoundStoring[i].clip = aud;
+                SoundStoring[i].volume = volume;
+                SoundStoring[i].PlayDelayed(t);
+                played = true;
+                break;
+            }
+        }
+        if (!played)
+        {
+            SoundStoring[0].clip = aud;
+            SoundStoring[0].volume = volume;
+            SoundStoring[0].Play();
+        }
+    }
+
+    void PlaySound(AudioClip aud, float t, float volume, float pitch)
+    {
+        bool played = false;
+        for (int i = 0; i < SoundStoring.Length; i++)
+        {
+            if (!SoundStoring[i].isPlaying)
+            {
+                SoundStoring[i].clip = aud;
+                SoundStoring[i].volume = volume;
+                SoundStoring[i].pitch = pitch;
+                SoundStoring[i].PlayDelayed(t);
+                played = true;
+                break;
+            }
+        }
+        if (!played)
+        {
+            SoundStoring[0].clip = aud;
+            SoundStoring[0].volume = volume;
+            SoundStoring[0].pitch = pitch;
+            SoundStoring[0].Play();
+        }
+    }
+    #endregion
+
     public void Death()
     {
         stat.ElementLoss(3);
@@ -217,12 +313,14 @@ public class Player : MonoBehaviour
             isGrounded = false;
             a.SetBool("Grounded", isGrounded);
             r.velocity = new Vector2(r.velocity.x, Jump * Speed);
+            PlaySound(AudioClips["jump"]);
         }
         else if (Input.GetKeyDown(KeyCode.Mouse0) && isGrounded && x == 0 && !Action.Contains("Attack"))
         {
             a.SetTrigger("Attack");
             Action.Add("Attack");
-            ActionTimer.Add(1.25f);
+            ActionTimer.Add(1f);
+            PlaySound(AudioClips["attack"], 0.2f);
         }
         else if (Input.GetKeyDown(KeyCode.LeftShift) && !Action.Contains("Dash") && X != 0)
         {
@@ -230,6 +328,7 @@ public class Player : MonoBehaviour
             Action.Add("Dash");
             ActionTimer.Add(1f);
             Dash = x * Speed * 2f;
+            PlaySound(AudioClips["dash"], 0f, 1f, 0.8f);
         }
         else if (Input.GetKey(KeyCode.LeftShift) && X == 0 && !Absorbed)
         {
@@ -237,6 +336,7 @@ public class Player : MonoBehaviour
             if (AbsorbTimer >= 0.5f)
             {
                 stat.ElementAbsorption();
+                PlaySound(AudioClips["absorb"]);
                 Absorbed = true;
             }
         }
@@ -256,5 +356,6 @@ public class Player : MonoBehaviour
     {
         Action.Add("TakeHit");
         ActionTimer.Add(0.5f);
+        PlaySound(AudioClips["taken"]);
     }
 }

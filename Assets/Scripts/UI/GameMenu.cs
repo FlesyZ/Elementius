@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UI
@@ -12,12 +13,15 @@ namespace UI
 
         bool isMenu;
         bool processing;
+        int isUnlocked;
         public bool menu { get; private set; }
 
-        List<GameObject> menuButtons = new List<GameObject>();
+        public List<GameObject> menuButtons { get; set; } = new List<GameObject>();
+        List<Text> texts = new List<Text>();
         MenuButton[] options;
         Animator[] anim;
-        Text[] texts;
+
+        AudioSource select;
 
         void Awake()
         {
@@ -27,20 +31,23 @@ namespace UI
             }
 
             anim = new Animator[menuButtons.Count];
-            texts = new Text[menuButtons.Count];
 
             options = new MenuButton[menuButtons.Count];
 
             for (int i = 0; i < anim.Length; i++)
             {
                 anim[i] = menuButtons[i].GetComponent<Animator>();
-                texts[i] = menuButtons[i].GetComponent<Text>();
+                texts.Add(menuButtons[i].GetComponent<Text>());
 
                 options[i] = menuButtons[i].GetComponent<MenuButton>();
                 options[i].order = i;
             }
 
-            menuButtons[2].GetComponent<MenuButton>().unlocked = true;
+            select = gameObject.AddComponent<AudioSource>();
+
+            options[2].unlocked = true;
+
+            select.clip = Resources.Load<AudioClip>("Sounds/Select");
         }
 
         void Start()
@@ -58,45 +65,68 @@ namespace UI
                 {
                     if (SelectedOption.Count == 0)
                     {
+                        //main.volume = 0.5f;
+                        select.Play();
                         menu = false;
                     }
                     else
                     {
-                        int x = Mathf.Clamp(SelectedOption.Count - 1, 0, SelectedOption.Count - 1);
-                        option = SelectedOption[x];
-                        StartCoroutine(ToggleOption(menuButtons[(int)option].transform.GetChild(0).GetComponent<Text>(), false));
-                        SelectedOption.RemoveAt(x);
+                        option = SelectedOption[SelectedOption.Count - 1];
+                        StartCoroutine(ToggleOption(menuButtons[SelectedOption[SelectedOption.Count - 1]].transform.GetChild(0).GetComponent<Text>(), true, false));
                     }
                 }
 
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
-                    if (option != null)
+                    if (option != null && SelectedOption.Count == 0)
+                    {
+                        //main.volume = 0.5f;
+                        select.Play();
+
                         Selected();
+                    }
                 }
                 else if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    if (SelectedOption == null || option != null)
+                    if (SelectedOption.Count == 0 || option != null)
                     {
                         option--;
                         if (option < 0)
-                            option += texts.Length;
+                            option += texts.Count;
 
-                        OptionRejudge();
+                        OptionRejudge(true);
                     }
-                    Debug.Log(option);
+                    /*
+                    else if (SelectedOption[0] == 2 || option != null)
+                    {
+                        option--;
+                        if (option < 0)
+                            option += texts.Count;
+                    }
+                    */
+
+                    select.Play();
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    if (SelectedOption == null || option != null)
+                    if (SelectedOption.Count == 0 || option != null)
                     {
                         option++;
-                        if (option >= texts.Length)
+                        if (option >= texts.Count)
                             option = 0;
 
-                        OptionRejudge();
+                        OptionRejudge(false);
                     }
-                    Debug.Log(option);
+                    /*
+                    else if (SelectedOption[0] == 2 || option != null)
+                    {
+                        option++;
+                        if (option >= texts.Count)
+                            option = 0;
+                    }
+                    */
+
+                    select.Play();
                 }
 
                 Display();
@@ -114,18 +144,37 @@ namespace UI
 
         }
 
-        void OptionRejudge()
+        void OptionRejudge(bool isBackwards)
         {
-            int isUnlocked = 0;
-            for (int i = 0; i < menuButtons.Count; i++)
+            isUnlocked = 0;
+            if (isBackwards)
             {
-                if (option == i && !options[i].unlocked)
+                for (int i = menuButtons.Count - 1; i >= 0; i--)
                 {
-                    option++;
-                    isUnlocked++;
+                    if (option == i && !options[i].unlocked)
+                    {
+                        option--;
+                        isUnlocked--;
+                    }
+                    if (isUnlocked <= menuButtons.Count * -1)
+                        option = null;
+
+                    if (option < 0)
+                        option += texts.Count;
                 }
-                if (isUnlocked >= menuButtons.Count)
-                    option = null;
+            }
+            else
+            {
+                for (int i = 0; i < menuButtons.Count; i++)
+                {
+                    if (option == i && !options[i].unlocked)
+                    {
+                        option++;
+                        isUnlocked++;
+                    }
+                    if (isUnlocked >= menuButtons.Count)
+                        option = null;
+                }
             }
         }
 
@@ -134,8 +183,15 @@ namespace UI
             if (SelectedOption.Count == 0)
             {
                 SelectedOption.Add((int)option);
-                StartCoroutine(ToggleOption(menuButtons[(int)option].transform.GetChild(0).GetComponent<Text>(), true));
-                option = null;
+
+                if (menuButtons[SelectedOption[SelectedOption.Count - 1]].transform.childCount > 0)
+                {
+                    StartCoroutine(ToggleOption(menuButtons[SelectedOption[SelectedOption.Count - 1]].transform.GetChild(0).GetComponent<Text>(), false, true));
+                }
+                else
+                {
+                    SelectedOption.RemoveAt(SelectedOption.Count - 1);
+                }
             }
         }
 
@@ -145,23 +201,48 @@ namespace UI
             {
                 if (option != null)
                 {
-                    ColorRenderer(texts, Color.gray);
+                    Color nonSelected = new Color(0.7f, 0.7f, 0.7f, 1f);
+                    ColorRenderer(texts, nonSelected);
+
+                    for (int i = 0; i < texts.Count; i++)
+                    {
+                        if (!options[i].unlocked)
+                            ColorHighlighter(texts[i], Color.gray);
+                    }
+
                     ColorHighlighter(texts[(int)option], Color.yellow);
                 }
                 else
                     ColorRenderer(texts, Color.gray);
             }
-            else
+            else if (SelectedOption[0] == 2)
             {
-                Color nonSelected = new Color(0.7f, 0.7f, 0.7f, 1f);
+                if (option != null)
+                {
+                    Color nonSelected = new Color(0.7f, 0.7f, 0.7f, 1f);
+                    ColorRenderer(texts, nonSelected);
+
+                    for (int i = 0; i < texts.Count; i++)
+                    {
+                        if (!options[i].unlocked)
+                            ColorHighlighter(texts[i], Color.gray);
+                    }
+
+                    ColorHighlighter(texts[(int)option], Color.yellow);
+                }
+                else
+                    ColorRenderer(texts, Color.gray);
+            }
+            else 
+            {
                 Color selected = new Color(0.7f, 0.7f, 0f, 1f);
-                ColorRenderer(texts, nonSelected);
+                ColorRenderer(texts, Color.gray);
                 ColorHighlighter(texts[SelectedOption[0]], selected);
             }
         }
 
         #region 處理顏色
-        void ColorRenderer(Text[] texts, Color color)
+        void ColorRenderer(List<Text> texts, Color color)
         {
             foreach (var item in texts)
                 item.color = color;
@@ -173,35 +254,81 @@ namespace UI
         }
         #endregion
 
-        public IEnumerator ToggleOption(Text selected, bool value)
+        public IEnumerator ToggleOption(Text selected, bool isRemove, bool value)
         {
-            selected.canvasRenderer.SetAlpha(value ? 1 : 0);
+            selected.gameObject.SetActive(value);
             
             processing = true;
 
-            Animator anim;
+            Animator animator;
 
-            switch (option)
+
+            if (isRemove)
             {
-                case 0:
-                    break;
-                case 1:
-                    Text[] status = selected.transform.GetChild(0).GetComponentsInChildren<Text>();
-                    Player player = FindObjectOfType<Player>();
+                switch (option)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        option = 1;
+                        break;
+                    case 2:
+                        Display();
 
-                    status[1].text = player.stat.STR.ToString();
-                    status[2].text = player.stat.AGI.ToString();
-                    status[3].text = player.stat.INT.ToString();
-                    status[4].text = player.stat.LUK.ToString();
-                    break;
-                case 2:
-                    break;
-                case null:
-                    break;
+                        menuButtons.Clear();
+                        texts.Clear();
+
+                        for (int i = 0; i < transform.childCount; i++)
+                        {
+                            menuButtons.Add(transform.GetChild(i).gameObject);
+                        }
+
+                        for (int i = 0; i < anim.Length; i++)
+                        {
+                            texts.Add(menuButtons[i].GetComponent<Text>());
+                        }
+
+                        option = 2;
+                        break;
+                    case null:
+                        break;
+                }
+
+                SelectedOption.RemoveAt(SelectedOption.Count - 1);
+            }
+            else
+            {
+                switch (option)
+                {
+                    case 0:
+                        break;
+                    case 1:
+
+                        Text[] status = selected.GetComponentsInChildren<Text>();
+                        Player player = FindObjectOfType<Player>();
+
+                        status[1].text = player.stat.STR.ToString();
+                        status[2].text = player.stat.AGI.ToString();
+                        status[3].text = player.stat.INT.ToString();
+                        status[4].text = player.stat.LUK.ToString();
+
+                        option = null;
+                        break;
+                    case 2:
+                        Time.timeScale = 1f;
+                        Destroy(GameObject.Find("UI"));
+                        SceneManager.LoadScene("TitleScene");
+                        break;
+                    case null:
+                        break;
+                }
             }
 
-            anim = selected.transform.GetChild(0).GetComponent<Animator>();
-            anim.SetTrigger("Move");
+            if (option != 2)
+            {
+                animator = selected.GetComponent<Animator>();
+                animator.SetTrigger("Move");
+            }
 
             yield return new WaitForSecondsRealtime(0.5f);
 
@@ -218,7 +345,7 @@ namespace UI
                 Time.timeScale = 0;
 
                 option = 0;
-                OptionRejudge();
+                OptionRejudge(false);
             }
 
             foreach (var item in anim)

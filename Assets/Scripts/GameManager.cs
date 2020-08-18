@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
 
     private float playOne = 1;
 
+    private Trigger[] triggers;
+
+    public AudioSource GetItem { get; private set; }
+    AudioSource GameOverSound;
+
     void Awake()
     {
         StatWithElement[] stats = FindObjectsOfType<StatWithElement>();
@@ -37,6 +42,21 @@ public class GameManager : MonoBehaviour
         UI.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceCamera;
         UI.GetComponent<Canvas>().worldCamera = Camera.main;
         UI.GetComponent<Canvas>().sortingOrder = 100;
+
+        triggers = FindObjectsOfType<Trigger>();
+        for (int i = 0; i < triggers.Length; i++)
+        {
+            if (triggers[i].TriggerName == "TriggerMenu")
+            {
+                UI.GameMenu menu = FindObjectOfType<UI.GameMenu>();
+                triggers[i].trigger = menu.menuButtons[triggers[i].index];
+            }
+        }
+
+        GetItem = gameObject.AddComponent<AudioSource>();
+        GameOverSound = gameObject.AddComponent<AudioSource>();
+
+        GetItem.clip = Resources.Load<AudioClip>("Sounds/Item");
     }
 
     private IEnumerator FadeOut()
@@ -54,6 +74,8 @@ public class GameManager : MonoBehaviour
         {
             anim[i].SetTrigger("Move");
             player[i].play = true;
+
+            Camera.main.GetComponent<AudioSource>().Play();
         }
     }
 
@@ -85,6 +107,9 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator GameOver()
     {
+        GameOverSound.Play();
+        StartCoroutine(FadeOutMusic());
+
         gameover.GetComponent<CanvasGroup>().alpha = 1;
         gameover.CrossFadeAlpha(0.7f, 1f, false);
         yield return new WaitForSeconds(1f);
@@ -96,5 +121,16 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(5f);
 
         SceneManager.LoadScene("TitleScene");
+    }
+
+    private IEnumerator FadeOutMusic()
+    {
+        AudioSource audio = Camera.main.GetComponent<AudioSource>();
+
+        while (audio.volume > 0)
+        {
+            audio.volume -= 0.01f;
+            yield return null;
+        }
     }
 }

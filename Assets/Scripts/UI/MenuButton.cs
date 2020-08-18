@@ -38,8 +38,20 @@ namespace UI
 
         void Update()
         {
-            if (menu && !unlocked) Obfuscated();
+            if (menu)
+            {
+                if (unlocked)
+                {
+                    string temp = "";
 
+                    for (int i = 0; i < order; i++)
+                        temp += " ";
+
+                    text.text = temp + name;
+                }
+                else
+                    Obfuscated();
+            }
         }
 
         void Obfuscated()
