@@ -185,6 +185,8 @@ namespace Game
                     value *= (isAttack) ? 2f : 1f;
             }
 
+            value *= (isAttack) ? 1.5f : 1f;
+
             return Random.Range(value * 0.9f, value * 1.1f);
         }
     }

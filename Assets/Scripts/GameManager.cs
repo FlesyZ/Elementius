@@ -121,6 +121,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(5f);
 
         SceneManager.LoadScene("TitleScene");
+        Destroy(GameObject.Find("UI"));
     }
 
     private IEnumerator FadeOutMusic()

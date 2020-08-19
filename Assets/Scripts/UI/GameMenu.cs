@@ -21,7 +21,8 @@ namespace UI
         MenuButton[] options;
         Animator[] anim;
 
-        AudioSource select;
+        AudioSource menuSound;
+        AudioClip select, confirm, back;
 
         void Awake()
         {
@@ -43,11 +44,13 @@ namespace UI
                 options[i].order = i;
             }
 
-            select = gameObject.AddComponent<AudioSource>();
+            menuSound = gameObject.AddComponent<AudioSource>();
 
             options[2].unlocked = true;
 
-            select.clip = Resources.Load<AudioClip>("Sounds/Select");
+            select = Resources.Load<AudioClip>("Sounds/Select");
+            back = Resources.Load<AudioClip>("Sounds/Take_Hit");
+            confirm = Resources.Load<AudioClip>("Sounds/Selection");
         }
 
         void Start()
@@ -66,7 +69,7 @@ namespace UI
                     if (SelectedOption.Count == 0)
                     {
                         //main.volume = 0.5f;
-                        select.Play();
+                        menuSound.PlayOneShot(back);
                         menu = false;
                     }
                     else
@@ -81,7 +84,7 @@ namespace UI
                     if (option != null && SelectedOption.Count == 0)
                     {
                         //main.volume = 0.5f;
-                        select.Play();
+                        menuSound.PlayOneShot(confirm);
 
                         Selected();
                     }
@@ -105,7 +108,7 @@ namespace UI
                     }
                     */
 
-                    select.Play();
+                    menuSound.PlayOneShot(select);
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
@@ -126,13 +129,14 @@ namespace UI
                     }
                     */
 
-                    select.Play();
+                    menuSound.PlayOneShot(select);
                 }
 
                 Display();
             }
             else if (Input.GetKeyDown(KeyCode.Escape) && !menu)
             {
+                menuSound.PlayOneShot(select);
                 menu = true;
             }
 
@@ -315,6 +319,8 @@ namespace UI
                         option = null;
                         break;
                     case 2:
+                        menuSound.PlayOneShot(confirm);
+                        yield return new WaitForSecondsRealtime(0.8f);
                         Time.timeScale = 1f;
                         Destroy(GameObject.Find("UI"));
                         SceneManager.LoadScene("TitleScene");
